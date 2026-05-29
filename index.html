@@ -1,390 +1,656 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Monitoring Personel Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        :root {
-            --primary: #1E40AF;
-            --primary-light: #3B82F6;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --danger: #EF4444;
-            --bg: #F8FAFC;
-            --card: #FFFFFF;
-            --text: #0F172A;
-            --text-muted: #64748B;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 50px; }
-
-        /* UTILITAS */
-        .hidden { display: none !important; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-light); }
-        .btn-danger { background: var(--danger); color: white; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
-        .badge-danger { background: #FEE2E2; color: #991B1B; }
-        .badge-success { background: #D1FAE5; color: #065F46; }
-
-        /* HALAMAN LOGIN */
-        .login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%); }
-        .login-box { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; font-weight: 500; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; outline: none; }
-        .form-group input:focus { border-color: var(--primary-light); }
-
-        /* NAVBAR */
-        nav { background: var(--primary); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .nav-user { display: flex; align-items: center; gap: 15px; }
-
-        /* DASHBOARD LAYOUT */
-        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
-        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
-
-        /* PENGUMUMAN */
-        .announcement-box { background: #EFF6FF; border-left: 4px solid var(--primary-light); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-
-        /* TABEL */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #E2E8F0; }
-        th { background: #F1F5F9; color: var(--text-muted); font-size: 0.85rem; }
-        .clickable-kendala { color: var(--danger); cursor: pointer; text-decoration: underline; font-weight: 500; }
-
-        /* MODAL POPUP (DETAIL KENDALA) */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; position: relative; animation: slideIn 0.3s ease; }
-        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
-
-        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoring Tim Produksi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .loader { border-top-color: #4f46e5; animation: spinner 1s linear infinite; }
+    @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
 
-    <div id="login-section" class="login-screen">
-        <div class="login-box">
-            <h2 style="margin-bottom: 10px; color: var(--primary); text-align: center;"><i class="fa-solid fa-shield-halved"></i> Login Sistem</h2>
-            <p style="color: var(--text-muted); text-align: center; margin-bottom: 25px; font-size: 0.85rem;">Gunakan akun Admin atau Personel</p>
-            <div class="form-group">
-                <label>Pilih Hak Akses (Role)</label>
-                <select id="login-role">
-                    <option value="personel">Personel Lapangan</option>
-                    <option value="admin">Super Admin</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Nama / Username</label>
-                <input type="text" id="login-username" placeholder="Masukkan nama Anda..." value="Budi Santoso">
-            </div>
-            <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="handleLogin()">Masuk Ke Dashboard</button>
-            <div style="background: #F1F5F9; padding: 10px; border-radius: 8px; margin-top: 20px; font-size: 0.75rem; color: var(--text-muted);">
-                💡 <b>Petunjuk Demo:</b> Bebas isi nama apa saja, langsung klik tombol Masuk.
-            </div>
+  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden">
+    <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-12 w-12 mb-4"></div>
+    <p class="text-white font-medium text-sm">Sedang memproses ke server...</p>
+  </div>
+
+  <div id="loginScreen" class="flex min-h-screen items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 p-8 space-y-6">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl">
+          <i class="fa-solid fa-industry text-2xl"></i>
         </div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Sistem Monitoring Produksi</h1>
+        <p class="text-sm text-slate-500">Silakan masuk menggunakan akun Anda</p>
+      </div>
+      <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email</label>
+          <input type="email" id="loginEmail" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="nama@gmail.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">PIN Keamanan</label>
+          <input type="password" id="loginPin" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="••••">
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition shadow-md shadow-indigo-200">Masuk Aplikasi</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="appDashboard" class="hidden min-h-screen flex flex-col">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-6 py-4 flex items-center justify-between shadow-sm">
+      <div class="flex items-center space-x-3">
+        <span class="p-2 bg-indigo-600 text-white rounded-xl"><i class="fa-solid fa-chart-pie"></i></span>
+        <div>
+          <h2 class="font-bold text-lg text-slate-900">Dashboard Panel Utama</h2>
+          <p class="text-xs text-slate-500">Halo, <span id="userNama" class="font-semibold text-slate-700">User</span> (<span id="userRole" class="text-indigo-600 font-medium">Operator</span>)</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="bukaModalPin()" class="px-3 py-2 border border-slate-200 rounded-xl text-sm font-medium hover:bg-slate-50 text-slate-600 transition"><i class="fa-solid fa-key mr-2"></i>Ubah PIN</button>
+        <button onclick="handleLogout()" class="px-3 py-2 bg-rose-50 text-rose-600 rounded-xl text-sm font-medium hover:bg-rose-100 transition"><i class="fa-solid fa-right-from-bracket mr-2"></i>Keluar</button>
+      </div>
+    </header>
+
+    <main class="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white p-5 border border-slate-200/80 rounded-2xl shadow-sm flex items-center justify-between">
+          <div><p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sedang Berjalan</p><h3 id="statBerjalan" class="text-2xl font-bold mt-1">0</h3></div>
+          <span class="w-10 h-10 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-spinner"></i></span>
+        </div>
+        <div class="bg-white p-5 border border-slate-200/80 rounded-2xl shadow-sm flex items-center justify-between">
+          <div><p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Menunggu Approval</p><h3 id="statApproval" class="text-2xl font-bold mt-1">0</h3></div>
+          <span class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-clock-rotate-left"></i></span>
+        </div>
+        <div class="bg-white p-5 border border-slate-200/80 rounded-2xl shadow-sm flex items-center justify-between">
+          <div><p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Selesai Diverifikasi</p><h3 id="statSelesai" class="text-2xl font-bold mt-1">0</h3></div>
+          <span class="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-circle-check"></i></span>
+        </div>
+        <div class="bg-white p-5 border border-slate-200/80 rounded-2xl shadow-sm flex items-center justify-between">
+          <div><p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ditolak / Revisi</p><h3 id="statReject" class="text-2xl font-bold mt-1">0</h3></div>
+          <span class="w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-circle-xmark"></i></span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 lg:col-span-2 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-layer-group text-indigo-500 mr-2"></i>Line Produksi Aktif</h4>
+            <button id="btnTambahLine" onclick="bukaModalLine()" class="hidden text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i>Tambah Line</button>
+          </div>
+          <div class="overflow-x-auto flex-1 max-h-64 overflow-y-auto border border-slate-100 rounded-xl">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 font-semibold text-slate-600">
+                  <th class="p-3">Line / Jenis</th>
+                  <th class="p-3">Produk / Qty</th>
+                  <th class="p-3">Deadline Status</th>
+                  <th class="p-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tabelLineProduksi" class="divide-y divide-slate-100 text-slate-700">
+                <tr><td colspan="4" class="p-4 text-center text-slate-400">Memuat data dari server...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-bullhorn text-amber-500 mr-2"></i>Memo Internal</h4>
+            <button id="btnTambahMemo" onclick="bukaModalMemo()" class="hidden text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i>Rilis Memo</button>
+          </div>
+          <div id="containerMemo" class="space-y-3 flex-1 overflow-y-auto max-h-64 pr-1 text-xs">
+            <p class="text-slate-400 text-center py-4">Belum ada memo internal.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 flex flex-col">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <h4 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-list-check text-indigo-500 mr-2"></i>Monitoring Progres Tugas Tim</h4>
+            <p class="text-xs text-slate-400 mt-0.5">Daftar monitoring pembaruan status kerja per operator harian.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button id="btnTambahTugas" onclick="bukaModalTugas()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-xl text-xs transition shadow-sm"><i class="fa-solid fa-plus mr-1.5"></i>Tugaskan Personel</button>
+            <button onclick="loadDashboardData()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-xl text-xs font-medium transition"><i class="fa-solid fa-rotate mr-1"></i>Refresh Data</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-100 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 font-semibold text-slate-600">
+                <th class="p-3.5">Nama Personel</th>
+                <th class="p-3.5">Detail Tugas / Pekerjaan</th>
+                <th class="p-3.5">Target Selesai</th>
+                <th class="p-3.5">Status Kerja</th>
+                <th class="p-3.5">Kendala Lapangan</th>
+                <th class="p-3.5">Lampiran Bukti</th>
+                <th class="p-3.5 text-center">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="tabelPekerjaan Utama" class="divide-y divide-slate-100 text-slate-700">
+              <tr><td colspan="7" class="p-4 text-center text-slate-400">Silakan jalankan atau tunggu sinkronisasi data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="modalUpdate" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-xl border border-slate-100 p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-pen-to-square text-indigo-500 mr-2"></i>Perbarui Progress Tugas</h3>
+        <button onclick="tutupModal('modalUpdate')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form id="formUpdate" onsubmit="submitProgressTugas(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="upRow">
+        <input type="hidden" id="upBuktiLama">
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Status Pekerjaan</label>
+            <select id="upStatus" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Sedang Berjalan">Sedang Berjalan</option>
+              <option value="Menunggu Approval">Kirim Ke Admin (Menunggu Approval)</option>
+              <option value="Selesai">Selesai (Hanya Admin)</option>
+              <option value="Ditolak/Revisi">Ditolak/Revisi (Hanya Admin)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Apakah Ada Kendala?</label>
+            <select id="upKendala" onchange="toggleFormKendala(this.value)" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Tidak">Tidak Ada</option>
+              <option value="Ada">Ya, Ada Kendala</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="boxFormKendala" class="space-y-3 p-3 bg-slate-50 rounded-xl border border-slate-100 hidden">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Detail Kendala Lapangan</label>
+            <textarea id="upDetailKendala" class="w-full p-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 h-16" placeholder="Sebutkan kendala teknis/non-teknis..."></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Rencana Solusi</label>
+              <input type="text" id="upSolusi" class="w-full p-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Langkah perbaikan">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Revisi Target Tanggal</label>
+              <input type="date" id="upRevisiTarget" class="w-full p-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Unggah Lampiran Baru (Foto/Video/PDF)</label>
+          <input type="file" id="upFile" class="w-full p-2 border border-dashed border-slate-300 rounded-xl bg-slate-50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100">
+        </div>
+
+        <div id="boxAdminApprovalOnly" class="p-3 bg-indigo-50/60 rounded-xl border border-indigo-100 hidden space-y-2">
+          <p class="font-bold text-indigo-900"><i class="fa-solid fa-user-shield mr-1"></i>Khusus Verifikasi Admin</p>
+          <div>
+            <label class="block font-semibold text-indigo-950 mb-1">Catatan/Ulasan Admin Untuk Operator</label>
+            <input type="text" id="upCatatanAdmin" class="w-full p-2 rounded-lg border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" placeholder="Beri catatan revisi atau instruksi tambahan...">
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="tutupModal('modalUpdate')" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-medium hover:bg-slate-200">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 shadow-sm">Simpan Pembaruan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalAdminForm" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 flex items-center justify-center hidden p-4">
+    <div id="boxLineForm" class="bg-white rounded-2xl max-w-md w-full shadow-xl border p-6 space-y-4 hidden text-xs">
+       <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-layer-group text-indigo-500 mr-2"></i>Tambah Line Produksi Baru</h3>
+       <form onsubmit="submitLineBaru(event)" class="space-y-3">
+         <div><label class="block font-medium mb-1">Nama / Nomor Line</label><input type="text" id="addProdLine" required class="w-full p-2.5 border rounded-xl" placeholder="Contoh: Line 01 / Strip Glucose"></div>
+         <div><label class="block font-medium mb-1">Jenis Pekerjaan Produksi</label><input type="text" id="addProdJenis" required class="w-full p-2.5 border rounded-xl" placeholder="Contoh: Assembly / Karantina QC"></div>
+         <div><label class="block font-medium mb-1">Nama Produk Alat Kesehatan</label><input type="text" id="addProdNama" required class="w-full p-2.5 border rounded-xl" placeholder="Contoh: Incubator Baby Comen"></div>
+         <div class="grid grid-cols-2 gap-2">
+           <div><label class="block font-medium mb-1">Target Qty</label><input type="number" id="addProdQty" required class="w-full p-2.5 border rounded-xl" placeholder="100"></div>
+           <div><label class="block font-medium mb-1">Deadline Tanggal</label><input type="date" id="addProdDeadline" required class="w-full p-2.5 border rounded-xl"></div>
+         </div>
+         <div class="flex justify-end space-x-2 pt-2">
+           <button type="button" onclick="tutupModal('modalAdminForm')" class="px-4 py-2 bg-slate-100 rounded-xl">Batal</button>
+           <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl">Tambah</button>
+         </div>
+       </form>
     </div>
 
-    <div id="main-dashboard" class="hidden">
-        <nav>
-            <h2><i class="fa-solid fa-chart-network"></i> MonitorWork</h2>
-            <div class="nav-user">
-                <span>Halo, <b id="user-display-name">User</b> (<span id="user-display-role" style="text-transform: capitalize;">Role</span>)</span>
-                <button class="btn btn-danger" style="padding: 5px 12px; font-size: 0.85rem;" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
-            </div>
-        </nav>
-
-        <div class="container">
-            <div class="card">
-                <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-bullhorn" style="color: var(--warning)"></i> Pengumuman Terkini</h3>
-                <div id="announcement-list">
-                    </div>
-            </div>
-
-            <div class="dashboard-grid">
-                <div>
-                    <div id="panel-personel" class="card hidden">
-                        <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-pen-to-square"></i> Laporkan / Update Pekerjaan Baru</h3>
-                        <form id="job-form" onsubmit="submitJob(event)">
-                            <div class="form-group">
-                                <label>Nama Tugas / Aktivitas</label>
-                                <input type="text" id="job-title" required placeholder="Contoh: Perbaikan Router Sektor B">
-                            </div>
-                            <div class="form-group">
-                                <label>Progress Kerja (%)</label>
-                                <input type="number" id="job-progress" min="0" max="100" required placeholder="0 - 100">
-                            </div>
-                            <div class="form-group">
-                                <label>Upload Dokumentasi Foto (Simulasi)</label>
-                                <input type="file" id="job-img" accept="image/*" onchange="previewImage(event)">
-                                <input type="hidden" id="job-img-base64">
-                                <div id="img-preview-container" style="margin-top: 10px; display: none;">
-                                    <img id="img-preview" src="" style="max-height: 100px; border-radius: 8px;">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Kendala di Lapangan (Isi jika ada hambatan)</label>
-                                <textarea id="job-obstacle" rows="3" placeholder="Contoh: Cuaca hujan lebat atau alat penunjang kurang..."></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Kirim Laporan</button>
-                        </form>
-                    </div>
-
-                    <div id="panel-admin" class="card hidden">
-                        <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-megaphone"></i> Buat Pengumuman Baru (Super Admin)</h3>
-                        <div class="form-group">
-                            <textarea id="new-announcement-text" rows="2" placeholder="Tulis pengumuman penting untuk seluruh personel di sini..."></textarea>
-                        </div>
-                        <button class="btn btn-primary" onclick="addAnnouncement()"><i class="fa-solid fa-plus"></i> Broadcast Pengumuman</button>
-                    </div>
-
-                    <div class="card">
-                        <h3><i class="fa-solid fa-list-check"></i> Live Log Pekerjaan Personel</h3>
-                        <div style="overflow-x: auto;">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Waktu</th>
-                                        <th>Nama</th>
-                                        <th>Pekerjaan</th>
-                                        <th>Progres</th>
-                                        <th>Dokumentasi</th>
-                                        <th>Kendala</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="job-table-body">
-                                    </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="card" style="position: sticky; top: 20px;">
-                        <h3><i class="fa-solid fa-chart-pie"></i> Statistik Pekerjaan</h3>
-                        <div style="margin-top: 20px;">
-                            <canvas id="statsChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div id="boxTugasForm" class="bg-white rounded-2xl max-w-md w-full shadow-xl border p-6 space-y-4 hidden text-xs">
+       <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-user-plus text-indigo-500 mr-2"></i>Tugaskan Pekerjaan Baru</h3>
+       <form onsubmit="submitTugasBaru(event)" class="space-y-3">
+         <div><label class="block font-medium mb-1">Nama Personel / Operator</label><input type="text" id="addTugasNama" required class="w-full p-2.5 border rounded-xl" placeholder="Ketik nama operator penanggung jawab..."></div>
+         <div><label class="block font-medium mb-1">Judul Utama Pekerjaan</label><input type="text" id="addTugasJudul" required class="w-full p-2.5 border rounded-xl" placeholder="Contoh: Kalibrasi Sensor Suhu"></div>
+         <div><label class="block font-medium mb-1">Detail Rincian Tugas</label><textarea id="addTugasDetail" class="w-full p-2.5 border rounded-xl h-20" placeholder="Deskripsikan SOP kerja yang wajib dipenuhi..."></textarea></div>
+         <div><label class="block font-medium mb-1">Target Batas Selesai</label><input type="date" id="addTugasTarget" required class="w-full p-2.5 border rounded-xl"></div>
+         <div class="flex justify-end space-x-2 pt-2">
+           <button type="button" onclick="tutupModal('modalAdminForm')" class="px-4 py-2 bg-slate-100 rounded-xl">Batal</button>
+           <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl">Kirim Tugas</button>
+         </div>
+       </form>
     </div>
 
-    <div id="kendala-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h3 style="color: var(--danger); margin-bottom: 10px;"><i class="fa-solid fa-triangle-exclamation"></i> Detail Kendala Lapangan</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Dilaporkan oleh: <b id="modal-reporter">Nama</b></p>
-            <div id="modal-text" style="background: #FEE2E2; padding: 15px; border-radius: 8px; line-height: 1.5;">
-                Isi kendala...
-            </div>
-        </div>
+    <div id="boxMemoForm" class="bg-white rounded-2xl max-w-md w-full shadow-xl border p-6 space-y-4 hidden text-xs">
+       <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-bullhorn text-amber-500 mr-2"></i>Rilis Memo Internal Baru</h3>
+       <form onsubmit="submitMemoBaru(event)" class="space-y-3">
+         <div><label class="block font-medium mb-1">Judul Pengumuman/Memo</label><input type="text" id="addMemoJudul" required class="w-full p-2.5 border rounded-xl" placeholder="Contoh: Penyesuaian Jam Shift Lembur"></div>
+         <div><label class="block font-medium mb-1">Isi Pesan Pendek</label><textarea id="addMemoTeks" required class="w-full p-2.5 border rounded-xl h-24" placeholder="Tuliskan pesan instruksi resmi di sini..."></textarea></div>
+         <div class="flex justify-end space-x-2 pt-2">
+           <button type="button" onclick="tutupModal('modalAdminForm')" class="px-4 py-2 bg-slate-100 rounded-xl">Batal</button>
+           <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl">Sebarkan Memo</button>
+         </div>
+       </form>
     </div>
+  </div>
 
-    <script>
-        // Data Awal Dummy jika localStorage kosong
-        let dbJobs = JSON.parse(localStorage.getItem('dbJobs')) || [
-            { waktu: '10:15 WIB', nama: 'Budi Santoso', tugas: 'Instalasi Kabel Optik', progress: 100, img: '', kendala: '' },
-            { waktu: '09:30 WIB', nama: 'Randi Wijaya', tugas: 'Pengecekan Server Utama', progress: 45, img: '', kendala: 'Suhu ruangan server terlalu panas, butuh AC tambahan.' }
-        ];
+  <div id="modalPin" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-xl border p-6 space-y-4 text-xs">
+       <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-key text-indigo-500 mr-2"></i>Ubah PIN Keamanan User</h3>
+       <form onsubmit="submitUbahPin(event)" class="space-y-3">
+         <div><label class="block font-medium mb-1">PIN Lama Anda</label><input type="password" id="pinLama" required class="w-full p-2.5 border rounded-xl" placeholder="••••"></div>
+         <div><label class="block font-medium mb-1">PIN Baru Anda</label><input type="password" id="pinBaru" required class="w-full p-2.5 border rounded-xl" placeholder="••••"></div>
+         <div class="flex justify-end space-x-2 pt-2">
+           <button type="button" onclick="tutupModal('modalPin')" class="px-4 py-2 bg-slate-100 rounded-xl">Batal</button>
+           <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl">Simpan PIN</button>
+         </div>
+       </form>
+    </div>
+  </div>
 
-        let dbAnnouncements = JSON.parse(localStorage.getItem('dbAnnouncements')) || [
-            '⚠️ Pengingat: Semua personel wajib mengupload foto dokumentasi pengerjaan mulai hari ini.',
-            '📢 Rapat mingguan evaluasi kendala teknis diadakan besok jam 09:00 WIB via Zoom.'
-        ];
+  <script>
+    // WAJIB: GANTI DENGAN URL DEPLOYMENT WEB APP APPS SCRIPT ANDA!
+    const API_URL = "https://script.google.com/macros/s/AKfycbyhHR09k50yulT0brZg7-FJ5eQX0NTSYJskIoZrQvq5YqDSqZPEuwpubU1oxxJBl4ZXDQ/exec";
 
-        let currentUser = null;
-        let myChart = null;
+    let USER_SESSION = null;
+    let CACHE_DASHBOARD_DATA = null;
 
-        // SISTEM LOGIN
-        function handleLogin() {
-            const role = document.getElementById('login-role').value;
-            const username = document.getElementById('login-username').value.trim();
+    // Periksa Sesi Login Saat Halaman Diakses Pertama Kali
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = localStorage.getItem('monitoring_user');
+      if (savedUser) {
+        USER_SESSION = JSON.parse(savedUser);
+        initDashboardView();
+      } else {
+        showScreen('loginScreen');
+      }
+    });
 
-            if(!username) return alert('Nama harus diisi!');
+    function showScreen(id) {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('appDashboard').classList.add('hidden');
+      document.getElementById(id).classList.remove('hidden');
+    }
 
-            currentUser = { username, role };
-            
-            // Set UI teks
-            document.getElementById('user-display-name').textContent = username;
-            document.getElementById('user-display-role').textContent = role === 'admin' ? 'Super Admin' : 'Personel Lapangan';
+    function toggleLoader(show) {
+      const loader = document.getElementById('loadingOverlay');
+      if (show) loader.classList.remove('hidden');
+      else loader.classList.add('hidden');
+    }
 
-            // Ganti Screen View
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('main-dashboard').classList.remove('hidden');
+    function tutupModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
 
-            // Tampilkan panel sesuai Role
-            if(role === 'admin') {
-                document.getElementById('panel-admin').classList.remove('hidden');
-                document.getElementById('panel-personel').classList.add('hidden');
-            } else {
-                document.getElementById('panel-personel').classList.remove('hidden');
-                document.getElementById('panel-admin').classList.add('hidden');
-            }
+    // UTILITY: Mengonversi File Input Menjadi Base64 String
+    function convertFileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
 
-            // Render komponen data
-            renderAnnouncements();
-            renderTable();
-            initChart();
+    // SINKRONISASI API POST (Aman Terhindar dari Masalah CORS)
+    async function callApiPost(action, payload) {
+      toggleLoader(true);
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          mode: "cors",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: action, ...payload })
+        });
+        const result = await response.json();
+        toggleLoader(false);
+        return result;
+      } catch (err) {
+        toggleLoader(false);
+        alert("Gagal terhubung ke server backend: " + err.toString());
+        return { success: false, message: err.toString() };
+      }
+    }
+
+    // LOGIN LOGIC
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const pin = document.getElementById('loginPin').value;
+
+      const res = await callApiPost('verifikasiLogin', { email, pin });
+      if (res.success) {
+        USER_SESSION = res;
+        localStorage.setItem('monitoring_user', JSON.stringify(res));
+        initDashboardView();
+        document.getElementById('loginForm').reset();
+      } else {
+        alert(res.message);
+      }
+    }
+
+    function handleLogout() {
+      if(confirm("Apakah Anda yakin ingin keluar aplikasi?")) {
+        localStorage.removeItem('monitoring_user');
+        USER_SESSION = null;
+        showScreen('loginScreen');
+      }
+    }
+
+    // INITIALIZATION VIEW SETTING ACCORDING TO ROLE
+    function initDashboardView() {
+      showScreen('appDashboard');
+      document.getElementById('userNama').innerText = USER_SESSION.nama;
+      document.getElementById('userRole').innerText = USER_SESSION.isAdmin ? "Administrator" : "Operator Lapangan";
+
+      // Pengaturan hak akses visibilitas komponen tombol Admin
+      if (USER_SESSION.isAdmin) {
+        document.getElementById('btnTambahLine').classList.remove('hidden');
+        document.getElementById('btnTambahMemo').classList.remove('hidden');
+        document.getElementById('btnTambahTugas').classList.remove('hidden');
+      } else {
+        document.getElementById('btnTambahLine').classList.add('hidden');
+        document.getElementById('btnTambahMemo').classList.add('hidden');
+        document.getElementById('btnTambahTugas').classList.add('hidden');
+      }
+      loadDashboardData();
+    }
+
+    // AMBIL DATA DASHBOARD (GET METHOD)
+    async function loadDashboardData() {
+      toggleLoader(true);
+      try {
+        const response = await fetch(`${API_URL}?action=ambilDataDashboard`);
+        const res = await response.json();
+        toggleLoader(false);
+        if(res.success) {
+          CACHE_DASHBOARD_DATA = res;
+          renderDashboardStats(res.stats);
+          renderLineProduksi(res.listProduksiAktif);
+          renderMemo(res.memos);
+          renderTabelPekerjaan(res.rawData);
+        } else {
+          alert("Gagal memuat data dashboard: " + res.message);
         }
+      } catch(err) {
+        toggleLoader(false);
+        alert("Gagal sinkronisasi data GET: " + err.toString());
+      }
+    }
 
-        function handleLogout() {
-            document.getElementById('main-dashboard').classList.add('hidden');
-            document.getElementById('login-section').classList.remove('hidden');
-            currentUser = null;
+    function renderDashboardStats(stats) {
+      document.getElementById('statBerjalan').innerText = stats.berjalan;
+      document.getElementById('statApproval').innerText = stats.approval;
+      document.getElementById('statSelesai').innerText = stats.selesai;
+      document.getElementById('statReject').innerText = stats.reject;
+    }
+
+    function renderLineProduksi(lines) {
+      const tbody = document.getElementById('tabelLineProduksi');
+      if(!lines || lines.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">Tidak ada lini produksi aktif.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = lines.map(l => {
+        let badg = "bg-slate-100 text-slate-600";
+        if (l.remStatus.includes('OVERDUE')) badg = "bg-rose-100 text-rose-600 font-bold animate-pulse";
+        else if (l.remStatus.includes('DEADLINE')) badg = "bg-amber-100 text-amber-600 font-bold";
+        
+        return `
+          <tr class="hover:bg-slate-50/50">
+            <td class="p-3 font-medium text-slate-900">${l.line}<br><span class="text-[10px] text-slate-400">${l.jenis}</span></td>
+            <td class="p-3">${l.namaProduk}<br><span class="font-semibold text-indigo-600">${l.qty} Pcs</span></td>
+            <td class="p-3">${l.deadline}<br><span class="px-1.5 py-0.5 rounded text-[9px] ${badg}">${l.remStatus}</span></td>
+            <td class="p-3 text-center">
+               <button onclick="selesaikanLiniKerja(${l.row})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 px-2 py-1 rounded text-[10px] font-medium transition"><i class="fa-solid fa-check"></i> Selesai</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function selesaikanLiniKerja(row) {
+      if(confirm(`Selesaikan dan arsipkan antrean lini produksi baris ke-${row}?`)) {
+        const res = await callApiPost('selesaikanLine', { row: row, userEmail: USER_SESSION.email });
+        if(res.success) { alert(res.message); loadDashboardData(); }
+        else alert(res.message);
+      }
+    }
+
+    function renderMemo(memos) {
+      const container = document.getElementById('containerMemo');
+      if(!memos || memos.length === 0) {
+        container.innerHTML = `<p class="text-slate-400 text-center py-4">Belum ada memo internal hari ini.</p>`;
+        return;
+      }
+      container.innerHTML = memos.map(m => `
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl relative hover:shadow-sm transition">
+          <div class="flex items-center justify-between mb-1">
+            <h5 class="font-bold text-slate-800 text-xs">${m.judul}</h5>
+            <span class="text-[9px] text-slate-400 font-medium">${m.tgl}</span>
+          </div>
+          <p class="text-slate-600 text-[11px] leading-relaxed">${m.teks}</p>
+          ${USER_SESSION.isAdmin ? `<button onclick="hapusMemo(${m.row})" class="absolute bottom-1 right-2 text-rose-500 hover:text-rose-700 text-[10px]"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+        </div>
+      `).join('');
+    }
+
+    async function hapusMemo(row) {
+      if(confirm("Hapus memo pengumuman resmi ini?")) {
+        const res = await callApiPost('hapusMemoServer', { row, adminEmail: USER_SESSION.email });
+        if(res.success) { alert(res.message); loadDashboardData(); }
+      }
+    }
+
+    // RENDER UTAMA DAFTAR MONITORING PEKERJAAN TIM
+    function renderTabelPekerjaan(tasks) {
+      const tbody = document.getElementById('tabelPekerjaan Utama');
+      if(!tasks || tasks.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">Tidak ada penugasan kerja yang tercatat.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = tasks.map(t => {
+        let stColor = "bg-slate-100 text-slate-600";
+        if(t.status === "Selesai") stColor = "bg-emerald-100 text-emerald-700 font-medium";
+        else if(t.status === "Menunggu Approval") stColor = "bg-indigo-100 text-indigo-700 font-medium";
+        else if(t.status === "Ditolak/Revisi") stColor = "bg-rose-100 text-rose-700 font-medium";
+        else stColor = "bg-amber-100 text-amber-700 font-medium";
+
+        let linkBukti = t.bukti ? `<a href="${t.bukti}" target="_blank" class="text-indigo-600 hover:underline font-medium"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Lihat Bukti</a>` : '<span class="text-slate-400">Belum ada</span>';
+        
+        return `
+          <tr class="hover:bg-slate-50/40 text-slate-700">
+            <td class="p-3 font-semibold text-slate-900">${t.nama}</td>
+            <td class="p-3">
+              <span class="font-medium text-slate-800">${t.pekerjaan}</span>
+              <p class="text-[11px] text-slate-400 mt-0.5">${t.detailPekerjaan}</p>
+              ${t.catatanAdmin ? `<div class="mt-1 p-1.5 bg-indigo-50 border border-indigo-100 rounded text-[10px] text-indigo-900"><b>Ulasan Admin:</b> ${t.catatanAdmin}</div>` : ''}
+            </td>
+            <td class="p-3">
+               ${t.targetSelesai}
+               ${t.revisiTarget ? `<br><span class="text-rose-500 font-medium">Rev: ${t.revisiTarget}</span>` : ''}
+            </td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] ${stColor}">${t.status}</span></td>
+            <td class="p-3">
+               <span class="font-medium ${t.kendala === 'Ada' ? 'text-rose-600' : 'text-slate-500'}">${t.kendala}</span>
+               ${t.kendala === 'Ada' ? `<p class="text-[10px] text-slate-400 mt-0.5"><b>Detail:</b> ${t.detailKendala}<br><b>Solusi:</b> ${t.solusi}</p>` : ''}
+            </td>
+            <td class="p-3">${linkBukti}</td>
+            <td class="p-3 text-center space-y-1">
+               <button onclick="bukaModalEditTugas(${JSON.stringify(t).replace(/"/g, '&quot;')})" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded text-[11px] font-medium transition"><i class="fa-solid fa-edit mr-1"></i>Update</button>
+               ${USER_SESSION.isAdmin ? `<button onclick="hapusTugas(${t.row})" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 px-2 py-1 rounded text-[11px] transition"><i class="fa-solid fa-trash-can mr-1"></i>Hapus</button>` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function hapusTugas(row) {
+      if(confirm(`Apakah Anda yakin mau menghapus permanen tugas pada baris ${row}?`)) {
+        const res = await callApiPost('hapusTugasServer', { row, adminEmail: USER_SESSION.email });
+        if(res.success) { alert(res.message); loadDashboardData(); }
+      }
+    }
+
+    // LOGIC MODAL INTERACTIVE CONFIGURATION
+    function bukaModalPin() {
+      document.getElementById('modalPin').classList.remove('hidden');
+    }
+    async function submitUbahPin(e) {
+      e.preventDefault();
+      const pLama = document.getElementById('pinLama').value;
+      const pBaru = document.getElementById('pinBaru').value;
+      const res = await callApiPost('updatePinUser', { email: USER_SESSION.email, pinLama: pLama, pinBaru: pBaru });
+      alert(res.message);
+      if(res.success) { tutupModal('modalPin'); document.getElementById('modalPin').querySelector('form').reset(); }
+    }
+
+    function bukaModalLine() {
+      document.getElementById('modalAdminForm').classList.remove('hidden');
+      document.getElementById('boxLineForm').classList.remove('hidden');
+      document.getElementById('boxTugasForm').classList.add('hidden');
+      document.getElementById('boxMemoForm').classList.add('hidden');
+    }
+    async function submitLineBaru(e) {
+      e.preventDefault();
+      const payload = {
+        line: document.getElementById('addProdLine').value,
+        jenis: document.getElementById('addProdJenis').value,
+        namaProduk: document.getElementById('addProdNama').value,
+        qty: document.getElementById('addProdQty').value,
+        deadline: document.getElementById('addProdDeadline').value,
+        userEmail: USER_SESSION.email
+      };
+      const res = await callApiPost('tambahLineProduksi', payload);
+      alert(res.message); if(res.success) { tutupModal('modalAdminForm'); loadDashboardData(); document.getElementById('boxLineForm').querySelector('form').reset(); }
+    }
+
+    function bukaModalTugas() {
+      document.getElementById('modalAdminForm').classList.remove('hidden');
+      document.getElementById('boxTugasForm').classList.remove('hidden');
+      document.getElementById('boxLineForm').classList.add('hidden');
+      document.getElementById('boxMemoForm').classList.add('hidden');
+    }
+    async function submitTugasBaru(e) {
+      e.preventDefault();
+      const dataObj = {
+        nama: document.getElementById('addTugasNama').value,
+        pekerjaan: document.getElementById('addTugasJudul').value,
+        detail: document.getElementById('addTugasDetail').value,
+        target: document.getElementById('addTugasTarget').value
+      };
+      const res = await callApiPost('simpanDataBaru', { data: dataObj, userEmail: USER_SESSION.email });
+      alert(res.message); if(res.success) { tutupModal('modalAdminForm'); loadDashboardData(); document.getElementById('boxTugasForm').querySelector('form').reset(); }
+    }
+
+    function bukaModalMemo() {
+      document.getElementById('modalAdminForm').classList.remove('hidden');
+      document.getElementById('boxMemoForm').classList.remove('hidden');
+      document.getElementById('boxLineForm').classList.add('hidden');
+      document.getElementById('boxTugasForm').classList.add('hidden');
+    }
+    async function submitMemoBaru(e) {
+      e.preventDefault();
+      const judul = document.getElementById('addMemoJudul').value;
+      const teks = document.getElementById('addMemoTeks').value;
+      const res = await callApiPost('tambahMemo', { judul, teks, adminEmail: USER_SESSION.email });
+      alert(res.message); if(res.success) { tutupModal('modalAdminForm'); loadDashboardData(); document.getElementById('boxMemoForm').querySelector('form').reset(); }
+    }
+
+    // LOGIC MODAL BUKA UNTUK EDIT / UPDATE DATA PROGRESS
+    function bukaModalEditTugas(t) {
+      document.getElementById('modalUpdate').classList.remove('hidden');
+      document.getElementById('upRow').value = t.row;
+      document.getElementById('upBuktiLama').value = t.bukti;
+      document.getElementById('upStatus').value = t.status;
+      document.getElementById('upKendala').value = t.kendala;
+      document.getElementById('upDetailKendala').value = t.detailKendala;
+      document.getElementById('upSolusi').value = t.solusi;
+      document.getElementById('upRevisiTarget').value = t.revisiTargetIso;
+      document.getElementById('upCatatanAdmin').value = t.catatanAdmin;
+      document.getElementById('upFile').value = ""; // reset file input
+
+      toggleFormKendala(t.kendala);
+
+      if(USER_SESSION.isAdmin) {
+        document.getElementById('boxAdminApprovalOnly').classList.remove('hidden');
+      } else {
+        document.getElementById('boxAdminApprovalOnly').classList.add('hidden');
+      }
+    }
+
+    function toggleFormKendala(val) {
+      if(val === "Ada") document.getElementById('boxFormKendala').classList.remove('hidden');
+      else document.getElementById('boxFormKendala').classList.add('hidden');
+    }
+
+    async function submitProgressTugas(e) {
+      e.preventDefault();
+      
+      const fileInput = document.getElementById('upFile').files[0];
+      let base64Str = "";
+      if (fileInput) {
+        base64Str = await convertFileToBase64(fileInput);
+      }
+
+      const payloadData = {
+        row: parseInt(document.getElementById('upRow').value),
+        status: document.getElementById('upStatus').value,
+        kendala: document.getElementById('upKendala').value,
+        detailKendala: document.getElementById('upDetailKendala').value,
+        solusi: document.getElementById('upSolusi').value,
+        revisiTarget: document.getElementById('upRevisiTarget').value,
+        buktiLama: document.getElementById('upBuktiLama').value,
+        buktiBase64: base64Str,
+        currentUserEmail: USER_SESSION.email
+      };
+
+      // Jika yang login adalah admin, proses juga ulasan/approval adminnya ke sheet
+      const res = await callApiPost('verifikasiDanUpdate', { data: payloadData });
+      
+      if(res.success) {
+        if(USER_SESSION.isAdmin) {
+          // Kirimkan ulasan approval tambahan khusus admin jika diubah admin
+          await callApiPost('prosesApprovalAdmin', {
+            row: payloadData.row,
+            statusAkhir: payloadData.status,
+            catatan: document.getElementById('upCatatanAdmin').value,
+            adminEmail: USER_SESSION.email
+          });
         }
-
-        // SIMULASI UPLOAD FOTO (Mengubah File Gambar ke Base64)
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('job-img-base64').value = e.target.result;
-                    document.getElementById('img-preview').src = e.target.result;
-                    document.getElementById('img-preview-container').style.display = 'block';
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // TAMBAH DATA PEKERJAAN (PERSONEL)
-        function submitJob(e) {
-            e.preventDefault();
-            const title = document.getElementById('job-title').value;
-            const progress = parseInt(document.getElementById('job-progress').value);
-            const img = document.getElementById('job-img-base64').value;
-            const obstacle = document.getElementById('job-obstacle').value;
-
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) + ' WIB';
-
-            dbJobs.unshift({
-                waktu: timeStr,
-                nama: currentUser.username,
-                tugas: title,
-                progress: progress,
-                img: img,
-                kendala: obstacle
-            });
-
-            localStorage.setItem('dbJobs', JSON.stringify(dbJobs));
-            
-            // Reset Form
-            document.getElementById('job-form').reset();
-            document.getElementById('img-preview-container').style.display = 'none';
-            document.getElementById('job-img-base64').value = '';
-
-            renderTable();
-            updateChart();
-            alert('Laporan pekerjaan berhasil dikirim!');
-        }
-
-        // TAMBAH PENGUMUMAN (SUPER ADMIN)
-        function addAnnouncement() {
-            const text = document.getElementById('new-announcement-text').value.trim();
-            if(!text) return alert('Isi teks pengumuman!');
-
-            dbAnnouncements.unshift(text);
-            localStorage.setItem('dbAnnouncements', JSON.stringify(dbAnnouncements));
-            document.getElementById('new-announcement-text').value = '';
-            renderAnnouncements();
-        }
-
-        // RENDER KOMPONEN
-        function renderAnnouncements() {
-            const list = document.getElementById('announcement-list');
-            list.innerHTML = dbAnnouncements.map(ann => `
-                <div class="announcement-box">
-                    <p style="font-size:0.95rem; font-weight:500;">${ann}</p>
-                </div>
-            `).join('');
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('job-table-body');
-            tbody.innerHTML = dbJobs.map((job, index) => {
-                let badgeClass = job.progress === 100 ? 'badge-success' : 'badge-danger';
-                let progressBadge = `<span class="badge ${badgeClass}">${job.progress}%</span>`;
-                
-                let fotoElement = job.img ? `<img src="${job.img}" style="max-height:40px; border-radius:4px; cursor:pointer;" onclick="viewFoto('${job.img}')">` : '<span style="color:#94A3B8;">Tidak ada foto</span>';
-                
-                let kendalaElement = job.kendala 
-                    ? `<span class="clickable-kendala" onclick="openModal('${job.nama}', ${index})"><i class="fa-solid fa-circle-exclamation"></i> Lihat Kendala</span>` 
-                    : '<span style="color:#10B981; font-weight:500;">✔️ Aman</span>';
-
-                return `
-                    <tr>
-                        <td style="font-size:0.85rem; color:var(--text-muted);">${job.waktu}</td>
-                        <td><b>${job.nama}</b></td>
-                        <td>${job.tugas}</td>
-                        <td>${progressBadge}</td>
-                        <td>${fotoElement}</td>
-                        <td>${kendalaElement}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // SYSTEM MODAL DETAIL KENDALA (KLIK AKSI)
-        function openModal(reporter, index) {
-            document.getElementById('modal-reporter').textContent = reporter;
-            document.getElementById('modal-text').textContent = dbJobs[index].kendala;
-            document.getElementById('kendala-modal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('kendala-modal').classList.add('hidden');
-        }
-
-        function viewFoto(base64Src) {
-            // Membuka gambar di tab baru agar simpel
-            const newTab = window.open();
-            newTab.document.write(`<img src="${base64Src}" style="max-width:100%; height:auto; border-radius:8px;">`);
-        }
-
-        // SYSTEM STATISTIK (CHART.JS)
-        function initChart() {
-            const ctx = document.getElementById('statsChart').getContext('2d');
-            
-            // Hitung data
-            let selesai = dbJobs.filter(j => j.progress === 100).length;
-            let belumSelesai = dbJobs.filter(j => j.progress < 100).length;
-
-            myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Selesai (100%)', 'Dalam Proses (<100%)'],
-                    datasets: [{
-                        data: [selesai, belumSelesai],
-                        backgroundColor: ['#10B981', '#3B82F6'],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { position: 'bottom' } }
-                }
-            });
-        }
-
-        function updateChart() {
-            if(myChart) {
-                let selesai = dbJobs.filter(j => j.progress === 100).length;
-                let belumSelesai = dbJobs.filter(j => j.progress < 100).length;
-                myChart.data.datasets[0].data = [selesai, belumSelesai];
-                myChart.update();
-            }
-        }
-    </script>
+        alert("Sukses memperbarui progres tugas!");
+        tutupModal('modalUpdate');
+        loadDashboardData();
+      } else {
+        alert(res.message);
+      }
+    }
+  </script>
 </body>
 </html>
