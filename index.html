@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Monitoring Personel Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #1E40AF;
+            --primary-light: #3B82F6;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --bg: #F8FAFC;
+            --card: #FFFFFF;
+            --text: #0F172A;
+            --text-muted: #64748B;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 50px; }
+
+        /* UTILITAS */
+        .hidden { display: none !important; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-light); }
+        .btn-danger { background: var(--danger); color: white; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+        .badge-danger { background: #FEE2E2; color: #991B1B; }
+        .badge-success { background: #D1FAE5; color: #065F46; }
+
+        /* HALAMAN LOGIN */
+        .login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%); }
+        .login-box { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; outline: none; }
+        .form-group input:focus { border-color: var(--primary-light); }
+
+        /* NAVBAR */
+        nav { background: var(--primary); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-user { display: flex; align-items: center; gap: 15px; }
+
+        /* DASHBOARD LAYOUT */
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+        /* PENGUMUMAN */
+        .announcement-box { background: #EFF6FF; border-left: 4px solid var(--primary-light); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+
+        /* TABEL */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #E2E8F0; }
+        th { background: #F1F5F9; color: var(--text-muted); font-size: 0.85rem; }
+        .clickable-kendala { color: var(--danger); cursor: pointer; text-decoration: underline; font-weight: 500; }
+
+        /* MODAL POPUP (DETAIL KENDALA) */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; position: relative; animation: slideIn 0.3s ease; }
+        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+
+        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="login-section" class="login-screen">
+        <div class="login-box">
+            <h2 style="margin-bottom: 10px; color: var(--primary); text-align: center;"><i class="fa-solid fa-shield-halved"></i> Login Sistem</h2>
+            <p style="color: var(--text-muted); text-align: center; margin-bottom: 25px; font-size: 0.85rem;">Gunakan akun Admin atau Personel</p>
+            <div class="form-group">
+                <label>Pilih Hak Akses (Role)</label>
+                <select id="login-role">
+                    <option value="personel">Personel Lapangan</option>
+                    <option value="admin">Super Admin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nama / Username</label>
+                <input type="text" id="login-username" placeholder="Masukkan nama Anda..." value="Budi Santoso">
+            </div>
+            <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="handleLogin()">Masuk Ke Dashboard</button>
+            <div style="background: #F1F5F9; padding: 10px; border-radius: 8px; margin-top: 20px; font-size: 0.75rem; color: var(--text-muted);">
+                💡 <b>Petunjuk Demo:</b> Bebas isi nama apa saja, langsung klik tombol Masuk.
+            </div>
+        </div>
+    </div>
+
+    <div id="main-dashboard" class="hidden">
+        <nav>
+            <h2><i class="fa-solid fa-chart-network"></i> MonitorWork</h2>
+            <div class="nav-user">
+                <span>Halo, <b id="user-display-name">User</b> (<span id="user-display-role" style="text-transform: capitalize;">Role</span>)</span>
+                <button class="btn btn-danger" style="padding: 5px 12px; font-size: 0.85rem;" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="card">
+                <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-bullhorn" style="color: var(--warning)"></i> Pengumuman Terkini</h3>
+                <div id="announcement-list">
+                    </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div>
+                    <div id="panel-personel" class="card hidden">
+                        <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-pen-to-square"></i> Laporkan / Update Pekerjaan Baru</h3>
+                        <form id="job-form" onsubmit="submitJob(event)">
+                            <div class="form-group">
+                                <label>Nama Tugas / Aktivitas</label>
+                                <input type="text" id="job-title" required placeholder="Contoh: Perbaikan Router Sektor B">
+                            </div>
+                            <div class="form-group">
+                                <label>Progress Kerja (%)</label>
+                                <input type="number" id="job-progress" min="0" max="100" required placeholder="0 - 100">
+                            </div>
+                            <div class="form-group">
+                                <label>Upload Dokumentasi Foto (Simulasi)</label>
+                                <input type="file" id="job-img" accept="image/*" onchange="previewImage(event)">
+                                <input type="hidden" id="job-img-base64">
+                                <div id="img-preview-container" style="margin-top: 10px; display: none;">
+                                    <img id="img-preview" src="" style="max-height: 100px; border-radius: 8px;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Kendala di Lapangan (Isi jika ada hambatan)</label>
+                                <textarea id="job-obstacle" rows="3" placeholder="Contoh: Cuaca hujan lebat atau alat penunjang kurang..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Kirim Laporan</button>
+                        </form>
+                    </div>
+
+                    <div id="panel-admin" class="card hidden">
+                        <h3 style="margin-bottom: 15px;"><i class="fa-solid fa-megaphone"></i> Buat Pengumuman Baru (Super Admin)</h3>
+                        <div class="form-group">
+                            <textarea id="new-announcement-text" rows="2" placeholder="Tulis pengumuman penting untuk seluruh personel di sini..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="addAnnouncement()"><i class="fa-solid fa-plus"></i> Broadcast Pengumuman</button>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fa-solid fa-list-check"></i> Live Log Pekerjaan Personel</h3>
+                        <div style="overflow-x: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Waktu</th>
+                                        <th>Nama</th>
+                                        <th>Pekerjaan</th>
+                                        <th>Progres</th>
+                                        <th>Dokumentasi</th>
+                                        <th>Kendala</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="job-table-body">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card" style="position: sticky; top: 20px;">
+                        <h3><i class="fa-solid fa-chart-pie"></i> Statistik Pekerjaan</h3>
+                        <div style="margin-top: 20px;">
+                            <canvas id="statsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="kendala-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 style="color: var(--danger); margin-bottom: 10px;"><i class="fa-solid fa-triangle-exclamation"></i> Detail Kendala Lapangan</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Dilaporkan oleh: <b id="modal-reporter">Nama</b></p>
+            <div id="modal-text" style="background: #FEE2E2; padding: 15px; border-radius: 8px; line-height: 1.5;">
+                Isi kendala...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Awal Dummy jika localStorage kosong
+        let dbJobs = JSON.parse(localStorage.getItem('dbJobs')) || [
+            { waktu: '10:15 WIB', nama: 'Budi Santoso', tugas: 'Instalasi Kabel Optik', progress: 100, img: '', kendala: '' },
+            { waktu: '09:30 WIB', nama: 'Randi Wijaya', tugas: 'Pengecekan Server Utama', progress: 45, img: '', kendala: 'Suhu ruangan server terlalu panas, butuh AC tambahan.' }
+        ];
+
+        let dbAnnouncements = JSON.parse(localStorage.getItem('dbAnnouncements')) || [
+            '⚠️ Pengingat: Semua personel wajib mengupload foto dokumentasi pengerjaan mulai hari ini.',
+            '📢 Rapat mingguan evaluasi kendala teknis diadakan besok jam 09:00 WIB via Zoom.'
+        ];
+
+        let currentUser = null;
+        let myChart = null;
+
+        // SISTEM LOGIN
+        function handleLogin() {
+            const role = document.getElementById('login-role').value;
+            const username = document.getElementById('login-username').value.trim();
+
+            if(!username) return alert('Nama harus diisi!');
+
+            currentUser = { username, role };
+            
+            // Set UI teks
+            document.getElementById('user-display-name').textContent = username;
+            document.getElementById('user-display-role').textContent = role === 'admin' ? 'Super Admin' : 'Personel Lapangan';
+
+            // Ganti Screen View
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('main-dashboard').classList.remove('hidden');
+
+            // Tampilkan panel sesuai Role
+            if(role === 'admin') {
+                document.getElementById('panel-admin').classList.remove('hidden');
+                document.getElementById('panel-personel').classList.add('hidden');
+            } else {
+                document.getElementById('panel-personel').classList.remove('hidden');
+                document.getElementById('panel-admin').classList.add('hidden');
+            }
+
+            // Render komponen data
+            renderAnnouncements();
+            renderTable();
+            initChart();
+        }
+
+        function handleLogout() {
+            document.getElementById('main-dashboard').classList.add('hidden');
+            document.getElementById('login-section').classList.remove('hidden');
+            currentUser = null;
+        }
+
+        // SIMULASI UPLOAD FOTO (Mengubah File Gambar ke Base64)
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('job-img-base64').value = e.target.result;
+                    document.getElementById('img-preview').src = e.target.result;
+                    document.getElementById('img-preview-container').style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // TAMBAH DATA PEKERJAAN (PERSONEL)
+        function submitJob(e) {
+            e.preventDefault();
+            const title = document.getElementById('job-title').value;
+            const progress = parseInt(document.getElementById('job-progress').value);
+            const img = document.getElementById('job-img-base64').value;
+            const obstacle = document.getElementById('job-obstacle').value;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) + ' WIB';
+
+            dbJobs.unshift({
+                waktu: timeStr,
+                nama: currentUser.username,
+                tugas: title,
+                progress: progress,
+                img: img,
+                kendala: obstacle
+            });
+
+            localStorage.setItem('dbJobs', JSON.stringify(dbJobs));
+            
+            // Reset Form
+            document.getElementById('job-form').reset();
+            document.getElementById('img-preview-container').style.display = 'none';
+            document.getElementById('job-img-base64').value = '';
+
+            renderTable();
+            updateChart();
+            alert('Laporan pekerjaan berhasil dikirim!');
+        }
+
+        // TAMBAH PENGUMUMAN (SUPER ADMIN)
+        function addAnnouncement() {
+            const text = document.getElementById('new-announcement-text').value.trim();
+            if(!text) return alert('Isi teks pengumuman!');
+
+            dbAnnouncements.unshift(text);
+            localStorage.setItem('dbAnnouncements', JSON.stringify(dbAnnouncements));
+            document.getElementById('new-announcement-text').value = '';
+            renderAnnouncements();
+        }
+
+        // RENDER KOMPONEN
+        function renderAnnouncements() {
+            const list = document.getElementById('announcement-list');
+            list.innerHTML = dbAnnouncements.map(ann => `
+                <div class="announcement-box">
+                    <p style="font-size:0.95rem; font-weight:500;">${ann}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('job-table-body');
+            tbody.innerHTML = dbJobs.map((job, index) => {
+                let badgeClass = job.progress === 100 ? 'badge-success' : 'badge-danger';
+                let progressBadge = `<span class="badge ${badgeClass}">${job.progress}%</span>`;
+                
+                let fotoElement = job.img ? `<img src="${job.img}" style="max-height:40px; border-radius:4px; cursor:pointer;" onclick="viewFoto('${job.img}')">` : '<span style="color:#94A3B8;">Tidak ada foto</span>';
+                
+                let kendalaElement = job.kendala 
+                    ? `<span class="clickable-kendala" onclick="openModal('${job.nama}', ${index})"><i class="fa-solid fa-circle-exclamation"></i> Lihat Kendala</span>` 
+                    : '<span style="color:#10B981; font-weight:500;">✔️ Aman</span>';
+
+                return `
+                    <tr>
+                        <td style="font-size:0.85rem; color:var(--text-muted);">${job.waktu}</td>
+                        <td><b>${job.nama}</b></td>
+                        <td>${job.tugas}</td>
+                        <td>${progressBadge}</td>
+                        <td>${fotoElement}</td>
+                        <td>${kendalaElement}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // SYSTEM MODAL DETAIL KENDALA (KLIK AKSI)
+        function openModal(reporter, index) {
+            document.getElementById('modal-reporter').textContent = reporter;
+            document.getElementById('modal-text').textContent = dbJobs[index].kendala;
+            document.getElementById('kendala-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('kendala-modal').classList.add('hidden');
+        }
+
+        function viewFoto(base64Src) {
+            // Membuka gambar di tab baru agar simpel
+            const newTab = window.open();
+            newTab.document.write(`<img src="${base64Src}" style="max-width:100%; height:auto; border-radius:8px;">`);
+        }
+
+        // SYSTEM STATISTIK (CHART.JS)
+        function initChart() {
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            
+            // Hitung data
+            let selesai = dbJobs.filter(j => j.progress === 100).length;
+            let belumSelesai = dbJobs.filter(j => j.progress < 100).length;
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Selesai (100%)', 'Dalam Proses (<100%)'],
+                    datasets: [{
+                        data: [selesai, belumSelesai],
+                        backgroundColor: ['#10B981', '#3B82F6'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        function updateChart() {
+            if(myChart) {
+                let selesai = dbJobs.filter(j => j.progress === 100).length;
+                let belumSelesai = dbJobs.filter(j => j.progress < 100).length;
+                myChart.data.datasets[0].data = [selesai, belumSelesai];
+                myChart.update();
+            }
+        }
+    </script>
+</body>
+</html>
