@@ -2,734 +2,750 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Monitoring Tim Produksi</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid #fff; width: 16px; height: 16px; animation: spin 0.8s linear infinite; display: inline-block; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .card-hover:hover { border-color: #3b82f6; transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); transition: 0.2s; cursor: pointer; }
-    .pulse-green { animation: pulseG 1.5s infinite; }
-    @keyframes pulseG { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .loader { border-top-color: #4f46e5; animation: spinner 1s linear infinite; }
+    @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 h-screen flex flex-col md:flex-row overflow-hidden" onclick="tutupDropdownUser(event)">
-  
-  <header class="bg-slate-900 text-white p-4 flex justify-between items-center md:hidden shrink-0 z-50 shadow-md">
-    <div>
-      <h2 class="text-sm font-extrabold text-blue-400">PT INOVASI MEDIK INDONESIA</h2>
-      <p class="text-[9px] text-slate-400 tracking-wider font-bold">MONITORING TIM PRODUKSI</p>
-    </div>
-    <button onclick="toggleSidebarMobile()" class="text-white text-xl p-2 focus:outline-none"><i id="hamburgerIcon" class="fas fa-bars"></i></button>
-  </header>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
 
-  <aside id="mainSidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 w-80 bg-slate-900 text-slate-200 p-6 flex flex-col shadow-xl overflow-y-auto shrink-0 border-r border-slate-700 transition duration-300 ease-in-out z-40 top-[60px] md:top-0 h-[calc(100vh-60px)] md:h-full">
-    <div class="space-y-6">
-      <div class="hidden md:block border-b border-slate-700 pb-4">
-        <h2 class="text-xl font-extrabold tracking-tight text-blue-400 leading-tight">PT INOVASI MEDIK</h2>
-        <p class="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">MONITORING TIM PRODUKSI</p>
+  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden">
+    <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-12 w-12 mb-4"></div>
+    <p class="text-white font-medium text-sm">Sedang memproses ke server...</p>
+  </div>
+
+  <div id="loginScreen" class="flex min-h-screen items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 p-8 space-y-6">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl">
+          <i class="fa-solid fa-industry text-2xl"></i>
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Sistem Monitoring Produksi</h1>
+        <p class="text-sm text-slate-500">Silakan masuk menggunakan akun Anda</p>
       </div>
-      <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 text-center">
-        <p id="liveClock" class="text-[12px] font-bold text-slate-200 tracking-wider uppercase">Memuat Jam...</p>
+      <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email</label>
+          <input type="email" id="loginEmail" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="nama@gmail.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">PIN Keamanan</label>
+          <input type="password" id="loginPin" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="••••">
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition shadow-md shadow-indigo-200">Masuk Aplikasi</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="appDashboard" class="hidden min-h-screen flex flex-col">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-6 py-4 flex items-center justify-between shadow-sm">
+      <div class="flex items-center space-x-3">
+        <span class="p-2 bg-indigo-600 text-white rounded-xl"><i class="fa-solid fa-chart-pie"></i></span>
+        <div>
+          <h2 class="font-bold text-lg text-slate-900">Dashboard Panel Utama</h2>
+          <p class="text-xs text-slate-500">Halo, <span id="userNama" class="font-semibold text-slate-700">User</span> (<span id="userRole" class="text-indigo-600 font-medium">Operator</span>)</p>
+        </div>
       </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="bukaModalPin()" class="px-3 py-2 border border-slate-200 rounded-xl text-sm font-medium hover:bg-slate-50 text-slate-600 transition"><i class="fa-solid fa-key mr-2"></i>Ubah PIN</button>
+        <button onclick="handleLogout()" class="px-3 py-2 bg-rose-50 text-rose-600 rounded-xl text-sm font-medium hover:bg-rose-100 transition"><i class="fa-solid fa-right-from-bracket mr-2"></i>Keluar</button>
+      </div>
+    </header>
+
+    <main class="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
       
-      <div class="space-y-3">
-        <h3 class="text-xs font-bold uppercase text-slate-400 tracking-wider">Statistik Lapangan</h3>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl text-center shadow-inner">
-            <span id="txtSelesai" class="block text-2xl font-bold text-emerald-400">0</span>
-            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">SELESAI</span>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white p-5 border border-slate-200/80 rounded-2xl shadow-sm flex items-center justify-between">
+          <div><p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sedang Berjalan</p><h3 id="statBerjalan" class="text-2xl font-bold mt-1">0</h3></div>
+          <span class="w-10 h-10 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-spinner"></i></span>
+        </div>
+        <div class="bg-white p-5 border border-slate-200/80 rounded-2xl shadow-sm flex items-center justify-between">
+          <div><p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Menunggu Approval</p><h3 id="statApproval" class="text-2xl font-bold mt-1">0</h3></div>
+          <span class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-clock-rotate-left"></i></span>
+        </div>
+        <div class="bg-white p-5 border border-slate-200/80 rounded-2xl shadow-sm flex items-center justify-between">
+          <div><p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Selesai Diverifikasi</p><h3 id="statSelesai" class="text-2xl font-bold mt-1">0</h3></div>
+          <span class="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-circle-check"></i></span>
+        </div>
+        <div class="bg-white p-5 border border-slate-200/80 rounded-2xl shadow-sm flex items-center justify-between">
+          <div><p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ditolak / Revisi</p><h3 id="statReject" class="text-2xl font-bold mt-1">0</h3></div>
+          <span class="w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-circle-xmark"></i></span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 lg:col-span-2 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-layer-group text-indigo-500 mr-2"></i>Line Produksi Aktif</h4>
+            <button id="btnTambahLine" onclick="bukaModalLine()" class="hidden text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i>Tambah Line</button>
           </div>
-          <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl text-center shadow-inner">
-            <span id="txtBerjalan" class="block text-2xl font-bold text-blue-400">0</span>
-            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">PROGRES</span>
+          <div class="overflow-x-auto flex-1 max-h-64 overflow-y-auto border border-slate-100 rounded-xl">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 font-semibold text-slate-600">
+                  <th class="p-3">Line / Jenis</th>
+                  <th class="p-3">Produk / Qty</th>
+                  <th class="p-3">Deadline Status</th>
+                  <th class="p-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tabelLineProduksi" class="divide-y divide-slate-100 text-slate-700">
+                <tr><td colspan="4" class="p-4 text-center text-slate-400">Memuat data dari server...</td></tr>
+              </tbody>
+            </table>
           </div>
-          <div onclick="bukaKonteksList('Menunggu Approval')" class="bg-slate-800 border border-slate-700 p-3 rounded-xl text-center shadow-inner cursor-pointer hover:bg-slate-700/50 transition">
-            <span id="txtApproval" class="block text-2xl font-bold text-amber-400">0</span>
-            <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1">APPROVAL <i class="fas fa-search text-[8px]"></i></span>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-bullhorn text-amber-500 mr-2"></i>Memo Internal</h4>
+            <button id="btnTambahMemo" onclick="bukaModalMemo()" class="hidden text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus mr-1"></i>Rilis Memo</button>
           </div>
-          <div onclick="bukaKonteksList('Ditolak/Revisi')" class="bg-slate-800 border border-slate-700 p-3 rounded-xl text-center shadow-inner cursor-pointer hover:bg-slate-700/50 transition">
-            <span id="txtReject" class="block text-2xl font-bold text-rose-500">0</span>
-            <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1">REVISI <i class="fas fa-search text-[8px]"></i></span>
+          <div id="containerMemo" class="space-y-3 flex-1 overflow-y-auto max-h-64 pr-1 text-xs">
+            <p class="text-slate-400 text-center py-4">Belum ada memo internal.</p>
           </div>
         </div>
       </div>
-      
-      <div class="space-y-2">
-        <h3 class="text-xs font-bold uppercase text-amber-400 flex items-center gap-1.5"><i class="fas fa-bell"></i> REMINDER TARGET</h3>
-        <div id="boxReminder" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs"></div>
-      </div>
-      <div class="space-y-2">
-        <h3 class="text-xs font-bold uppercase text-rose-400 flex items-center gap-1.5"><i class="fas fa-exclamation-triangle"></i> KENDALA AKTIF</h3>
-        <div id="boxKendala" class="space-y-2 max-h-40 overflow-y-auto pr-1 text-xs"></div>
-      </div>
-    </div>
-  </aside>
 
-  <main class="flex-1 p-4 md:p-8 overflow-y-auto w-full">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xs font-bold text-slate-800 uppercase tracking-widest"><i class="fas fa-industry mr-2 text-slate-400"></i> Lini Produksi Aktif</h2>
-      <button id="btnTambahLine" onclick="bukaModal('modalTambahLine')" class="hidden bg-slate-800 hover:bg-slate-700 text-white font-bold text-[10px] px-3 py-1.5 rounded uppercase shadow-sm"><i class="fas fa-plus mr-1"></i> Tambah Line</button>
-    </div>
-    <div id="containerProduksi" class="mb-6 space-y-3"></div>
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 flex flex-col">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <h4 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-list-check text-indigo-500 mr-2"></i>Monitoring Progres Tugas Tim</h4>
+            <p class="text-xs text-slate-400 mt-0.5">Daftar monitoring pembaruan status kerja per operator harian.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button id="btnTambahTugas" onclick="bukaModalTugas()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-xl text-xs transition shadow-sm"><i class="fa-solid fa-plus mr-1.5"></i>Tugaskan Personel</button>
+            <button onclick="loadDashboardData()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-xl text-xs font-medium transition"><i class="fa-solid fa-rotate mr-1"></i>Refresh Data</button>
+          </div>
+        </div>
 
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-slate-200 pb-4">
-      <div class="flex items-center gap-4">
-        <h1 class="text-xl md:text-2xl font-black text-slate-800 uppercase tracking-tight">AKTIVITAS TUGAS</h1>
-        <div class="inline-flex rounded-lg border border-slate-300 p-0.5 bg-slate-200/80">
-          <button id="btnViewKartu" onclick="switchViewMode('kartu')" class="bg-white text-slate-800 font-bold text-[11px] px-3 py-1.5 rounded-md shadow-sm uppercase tracking-wider transition"><i class="fas fa-th-large mr-1.5"></i>Kartu</button>
-          <button id="btnViewKalender" onclick="switchViewMode('kalender')" class="text-slate-600 hover:text-slate-900 font-bold text-[11px] px-3 py-1.5 rounded-md uppercase tracking-wider transition"><i class="fas fa-calendar-alt mr-1.5"></i>Kalender</button>
+        <div class="overflow-x-auto border border-slate-100 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 font-semibold text-slate-600">
+                <th class="p-3.5">Nama Personel</th>
+                <th class="p-3.5">Detail Tugas / Pekerjaan</th>
+                <th class="p-3.5">Target Selesai</th>
+                <th class="p-3.5">Status Kerja</th>
+                <th class="p-3.5">Kendala Lapangan</th>
+                <th class="p-3.5">Lampiran Bukti</th>
+                <th class="p-3.5 text-center">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="tabelPekerjaan Utama" class="divide-y divide-slate-100 text-slate-700">
+              <tr><td colspan="7" class="p-4 text-center text-slate-400">Silakan jalankan atau tunggu sinkronisasi data...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-        <div id="authStatusArea" class="relative inline-block text-left"></div>
-        <button onclick="aksiTambahTugas()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow-md uppercase tracking-wider transition">+ Tambah Tugas</button>
-      </div>
-    </div>
-
-    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-6">
-      <div class="flex justify-between items-center mb-3 border-b pb-2">
-        <h2 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
-          <span class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span> Memo Internal Perusahaan
-        </h2>
-        <button id="btnEditAnn" onclick="bukaModal('modalTambahMemo')" class="hidden text-slate-400 hover:text-blue-600 font-bold text-[10px] uppercase"><i class="fas fa-plus mr-1"></i>Tambah Memo</button>
-      </div>
-      <div id="teksAnn" class="max-h-36 overflow-y-auto pr-2 space-y-3 text-xs text-slate-600">Memuat memo...</div>
-    </section>
-
-    <div id="viewKartuContainer" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5"></div>
-    
-    <div id="viewKalenderContainer" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 id="calMonthTitle" class="font-black text-slate-800 uppercase text-sm tracking-wider"> Mei 2026 </h3>
-        <div class="flex gap-1">
-          <button onclick="changeMonth(-1)" class="p-2 border rounded-lg hover:bg-slate-50 text-xs font-bold"><i class="fas fa-chevron-left"></i></button>
-          <button onclick="changeMonth(1)" class="p-2 border rounded-lg hover:bg-slate-50 text-xs font-bold"><i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-      <div class="grid grid-cols-7 gap-1 text-center font-bold text-[10px] text-slate-400 uppercase border-b pb-2 mb-2">
-        <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
-      </div>
-      <div id="calendarGrid" class="grid grid-cols-7 gap-1 auto-rows-[100px]"></div>
-    </div>
-  </main>
-
-  <button onclick="bukaModal('modalSOP')" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition-transform hover:scale-110 z-50">
-    <i class="fas fa-book"></i>
-  </button>
-
-  <div id="modalSOP" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-[200]">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
-      <button onclick="tutupModal('modalSOP')" class="absolute top-4 right-4 text-slate-400 text-xl font-bold">&times;</button>
-      <h2 class="text-sm font-black text-slate-800 uppercase mb-4 border-b pb-2"><i class="fas fa-info-circle mr-2"></i>Panduan SOP Aplikasi</h2>
-      <div class="text-xs text-slate-600 space-y-3 max-h-80 overflow-y-auto">
-        <p><b>1. Update Progres Mandiri:</b> Personel login via email & PIN untuk merubah tugas masing-masing.</p>
-        <p><b>2. Penanganan Kendala:</b> Jika memilih opsi kendala "Ada", wajib melampirkan keterangan detail serta rencana tanggal reschedule agar terpantau di panel utama dashboard.</p>
-      </div>
-    </div>
+    </main>
   </div>
 
-  <div id="modalLogin" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-[150]">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center relative">
-      <button onclick="tutupModal('modalLogin')" class="absolute top-4 right-4 text-slate-400 text-xl font-bold">&times;</button>
-      <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl"><i class="fas fa-user-lock"></i></div>
-      <h2 class="text-md font-extrabold text-slate-800 uppercase mb-4">LOGIN STAFF PRODUKSI</h2>
-      <div class="space-y-3 text-left">
-        <div>
-          <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Email Terdaftar</label>
-          <input type="email" id="loginEmail" placeholder="nama@inovasimedik.com" class="w-full border p-2 rounded-lg text-sm">
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">PIN</label>
-          <input type="password" id="loginPin" placeholder="****" class="w-full border p-2 rounded-lg text-center font-bold tracking-widest text-lg">
-        </div>
+  <div id="modalUpdate" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-xl border border-slate-100 p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-pen-to-square text-indigo-500 mr-2"></i>Perbarui Progress Tugas</h3>
+        <button onclick="tutupModal('modalUpdate')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-      <p id="loginErrorMsg" class="text-xs text-rose-600 font-bold mt-2 h-4"></p>
-      <button onclick="prosesLogin()" id="btnLoginSubmit" class="w-full bg-slate-900 text-white py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider mt-2 shadow-md">Masuk</button>
-    </div>
-  </div>
-
-  <div id="modalDetailInfo" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 z-[100]">
-    <div id="cardDetailContainer" class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border-t-8 border-t-blue-600 p-6">
-      <button onclick="tutupModal('modalDetailInfo')" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500 text-xl font-bold">&times;</button>
-      <div class="flex items-center gap-3 mb-4 pb-3 border-b">
-        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-lg"><i class="fas fa-file-invoice"></i></div>
-        <div>
-          <h3 class="font-black text-sm text-slate-800 uppercase">Detail Tugas</h3>
-          <p id="dtStatusBadge" class="text-[9px] font-bold uppercase tracking-wider mt-0.5 inline-block px-2 py-0.5 rounded"></p>
-        </div>
-      </div>
-      <div class="space-y-3 text-xs">
-        <p><b>Personel:</b> <span id="dtNama"></span></p>
-        <p><b>Target Selesai:</b> <span id="dtTarget"></span></p>
-        <div class="bg-slate-50 p-3 rounded-lg border">
-          <p class="font-bold text-slate-700" id="dtKerja"></p>
-          <p class="text-slate-500 mt-1" id="dtDetailKerja"></p>
-        </div>
-        <div id="dtBoxKendala" class="hidden bg-rose-50 p-3 rounded border border-rose-100 text-rose-800">
-          <p class="font-bold"><i class="fas fa-exclamation-circle"></i> Kendala:</p>
-          <p id="dtKendalaInfo"></p>
-          <p class="font-bold mt-2"><i class="fas fa-tools"></i> Solusi Terencana:</p>
-          <p id="dtSolusiInfo"></p>
-        </div>
-        <div id="dtBoxAdmin" class="hidden bg-amber-50 p-3 rounded border border-amber-200 text-amber-800">
-          <p class="font-bold">Catatan Admin:</p>
-          <p id="dtCatatanAdmin"></p>
-        </div>
-        <div id="dtBoxLampiran" class="hidden pt-2 border-t">
-          <a id="dtLinkLampiran" href="#" target="_blank" class="text-blue-600 font-bold underline"><i class="fas fa-paperclip"></i> Lihat File Lampiran/Bukti</a>
-        </div>
-        <div id="adminActionArea" class="hidden flex gap-2 justify-end border-t pt-3 mt-2"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="modalUpdate" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-[110]">
-    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden">
-      <div class="px-4 py-3 border-b bg-blue-600 text-white flex justify-between items-center">
-        <h3 class="font-bold text-xs uppercase tracking-wider">Update Progres Lapangan</h3>
-        <button onclick="tutupModal('modalUpdate')" class="text-xl">&times;</button>
-      </div>
-      <form class="p-5 space-y-3 text-xs" onsubmit="event.preventDefault(); finalSimpanUpdate();">
-        <input type="hidden" id="uRow">
-        <div class="bg-slate-50 p-2.5 rounded border font-bold" id="uPekerjaanLbl"></div>
+      <form id="formUpdate" onsubmit="submitProgressTugas(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="upRow">
+        <input type="hidden" id="upBuktiLama">
+        
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block mb-1 font-bold text-slate-500 uppercase">Status</label>
-            <select id="uStatus" class="w-full border p-1.5 rounded bg-white">
+            <label class="block font-semibold text-slate-600 mb-1">Status Pekerjaan</label>
+            <select id="upStatus" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="Sedang Berjalan">Sedang Berjalan</option>
-              <option value="Menunggu Approval">Selesai (Ajukan Approval)</option>
+              <option value="Menunggu Approval">Kirim Ke Admin (Menunggu Approval)</option>
+              <option value="Selesai">Selesai (Hanya Admin)</option>
+              <option value="Ditolak/Revisi">Ditolak/Revisi (Hanya Admin)</option>
             </select>
           </div>
           <div>
-            <label class="block mb-1 font-bold text-slate-500 uppercase">Ada Kendala?</label>
-            <select id="uKendala" onchange="toggleKendalaInput()" class="w-full border p-1.5 rounded bg-white">
-              <option value="Tidak">Tidak</option>
-              <option value="Ada">Ada</option>
+            <label class="block font-semibold text-slate-600 mb-1">Apakah Ada Kendala?</label>
+            <select id="upKendala" onchange="toggleFormKendala(this.value)" class="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Tidak">Tidak Ada</option>
+              <option value="Ada">Ya, Ada Kendala</option>
             </select>
           </div>
         </div>
+
+        <div id="boxFormKendala" class="space-y-3 p-3 bg-slate-50 rounded-xl border border-slate-100 hidden">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Detail Kendala Lapangan</label>
+            <textarea id="upDetailKendala" class="w-full p-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 h-16" placeholder="Sebutkan kendala teknis/non-teknis..."></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Rencana Solusi</label>
+              <input type="text" id="upSolusi" class="w-full p-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Langkah perbaikan">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Revisi Target Tanggal</label>
+              <input type="date" id="upRevisiTarget" class="w-full p-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+        </div>
+
         <div>
-          <label class="block mb-1 font-bold text-blue-600 uppercase">Upload Bukti Dokumen/Foto (Opsional)</label>
-          <input type="file" id="uBuktiFile" class="w-full border p-1 rounded bg-white text-[11px]">
+          <label class="block font-semibold text-slate-600 mb-1">Unggah Lampiran Baru (Foto/Video/PDF)</label>
+          <input type="file" id="upFile" class="w-full p-2 border border-dashed border-slate-300 rounded-xl bg-slate-50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100">
         </div>
-        <div id="boxKInput" class="hidden space-y-2 p-3 bg-rose-50 rounded-lg border border-rose-100">
-          <textarea id="uMasalah" placeholder="Uraikan kendala/masalah..." class="w-full border p-2 rounded bg-white"></textarea>
-          <textarea id="uSolusi" placeholder="Rencana tindakan korektif..." class="w-full border p-2 rounded bg-white"></textarea>
-          <label class="block font-bold text-rose-600 uppercase">Reschedule Target Tanggal Baru</label>
-          <input type="date" id="uRevisi" class="w-full border p-1.5 rounded bg-white">
+
+        <div id="boxAdminApprovalOnly" class="p-3 bg-indigo-50/60 rounded-xl border border-indigo-100 hidden space-y-2">
+          <p class="font-bold text-indigo-900"><i class="fa-solid fa-user-shield mr-1"></i>Khusus Verifikasi Admin</p>
+          <div>
+            <label class="block font-semibold text-indigo-950 mb-1">Catatan/Ulasan Admin Untuk Operator</label>
+            <input type="text" id="upCatatanAdmin" class="w-full p-2 rounded-lg border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" placeholder="Beri catatan revisi atau instruksi tambahan...">
+          </div>
         </div>
-        <button type="submit" id="btnSUpdate" class="w-full bg-blue-600 text-white py-2.5 rounded font-bold uppercase shadow-md">Simpan Perubahan</button>
+
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="tutupModal('modalUpdate')" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-medium hover:bg-slate-200">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 shadow-sm">Simpan Pembaruan</button>
+        </div>
       </form>
     </div>
   </div>
 
-  <div id="modalTambah" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden">
-      <div class="px-4 py-3 border-b bg-slate-100 flex justify-between items-center font-bold text-xs uppercase">
-        <h3>Tugas Produksi Baru</h3>
-        <button onclick="tutupModal('modalTambah')" class="text-lg">&times;</button>
-      </div>
-      <form class="p-5 space-y-3 text-xs" onsubmit="event.preventDefault(); submitBaru();">
-        <select id="tNama" class="w-full border p-2 rounded bg-white" required>
-          <option value="" disabled selected>Pilih Personel Lapangan...</option>
-          <option value="Ahmad Syauqi">Ahmad Syauqi</option>
-          <option value="Ajang Ahmar R">Ajang Ahmar R</option>
-          <option value="Andika Ardi K">Andika Ardi K</option>
-          <option value="Asep Sandi">Asep Sandi</option>
-          <option value="Fandi Dwi S">Fandi Dwi S</option>
-          <option value="Hamzah Rahmat H">Hamzah Rahmat H</option>
-          <option value="Ika Febriyanti">Ika Febriyanti</option>
-          <option value="Julian Alwan">Julian Alwan</option>
-          <option value="Kiki Choeruddin">Kiki Choeruddin</option>
-          <option value="M Fadillah Anwar">M Fadillah Anwar</option>
-          <option value="M Irfan Dani P">M Irfan Dani P</option>
-          <option value="Nanda Akmal R">Nanda Akmal R</option>
-          <option value="Subur Supriyono">Subur Supriyono</option>
-        </select>
-        <input type="text" id="tKerja" placeholder="Judul Pekerjaan..." class="w-full border p-2 rounded" required>
-        <textarea id="tDetail" placeholder="Deskripsi instruksi kerja detail..." class="w-full border p-2 rounded h-20" required></textarea>
-        <div>
-          <label class="block mb-1 text-slate-500 font-bold uppercase">Target Batas Selesai</label>
-          <input type="date" id="tTgl" class="w-full border p-2 rounded" required>
-        </div>
-        <button type="submit" id="btnSBaru" class="w-full bg-blue-600 text-white py-2.5 rounded font-bold uppercase tracking-wider shadow">Simpan</button>
-      </form>
+  <div id="modalAdminForm" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 flex items-center justify-center hidden p-4">
+    <div id="boxLineForm" class="bg-white rounded-2xl max-w-md w-full shadow-xl border p-6 space-y-4 hidden text-xs">
+       <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-layer-group text-indigo-500 mr-2"></i>Tambah Line Produksi Baru</h3>
+       <form onsubmit="submitLineBaru(event)" class="space-y-3">
+         <div><label class="block font-medium mb-1">Nama / Nomor Line</label><input type="text" id="addProdLine" required class="w-full p-2.5 border rounded-xl" placeholder="Contoh: Line 01 / Strip Glucose"></div>
+         <div><label class="block font-medium mb-1">Jenis Pekerjaan Produksi</label><input type="text" id="addProdJenis" required class="w-full p-2.5 border rounded-xl" placeholder="Contoh: Assembly / Karantina QC"></div>
+         <div><label class="block font-medium mb-1">Nama Produk Alat Kesehatan</label><input type="text" id="addProdNama" required class="w-full p-2.5 border rounded-xl" placeholder="Contoh: Incubator Baby Comen"></div>
+         <div class="grid grid-cols-2 gap-2">
+           <div><label class="block font-medium mb-1">Target Qty</label><input type="number" id="addProdQty" required class="w-full p-2.5 border rounded-xl" placeholder="100"></div>
+           <div><label class="block font-medium mb-1">Deadline Tanggal</label><input type="date" id="addProdDeadline" required class="w-full p-2.5 border rounded-xl"></div>
+         </div>
+         <div class="flex justify-end space-x-2 pt-2">
+           <button type="button" onclick="tutupModal('modalAdminForm')" class="px-4 py-2 bg-slate-100 rounded-xl">Batal</button>
+           <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl">Tambah</button>
+         </div>
+       </form>
+    </div>
+
+    <div id="boxTugasForm" class="bg-white rounded-2xl max-w-md w-full shadow-xl border p-6 space-y-4 hidden text-xs">
+       <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-user-plus text-indigo-500 mr-2"></i>Tugaskan Pekerjaan Baru</h3>
+       <form onsubmit="submitTugasBaru(event)" class="space-y-3">
+         <div><label class="block font-medium mb-1">Nama Personel / Operator</label><input type="text" id="addTugasNama" required class="w-full p-2.5 border rounded-xl" placeholder="Ketik nama operator penanggung jawab..."></div>
+         <div><label class="block font-medium mb-1">Judul Utama Pekerjaan</label><input type="text" id="addTugasJudul" required class="w-full p-2.5 border rounded-xl" placeholder="Contoh: Kalibrasi Sensor Suhu"></div>
+         <div><label class="block font-medium mb-1">Detail Rincian Tugas</label><textarea id="addTugasDetail" class="w-full p-2.5 border rounded-xl h-20" placeholder="Deskripsikan SOP kerja yang wajib dipenuhi..."></textarea></div>
+         <div><label class="block font-medium mb-1">Target Batas Selesai</label><input type="date" id="addTugasTarget" required class="w-full p-2.5 border rounded-xl"></div>
+         <div class="flex justify-end space-x-2 pt-2">
+           <button type="button" onclick="tutupModal('modalAdminForm')" class="px-4 py-2 bg-slate-100 rounded-xl">Batal</button>
+           <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl">Kirim Tugas</button>
+         </div>
+       </form>
+    </div>
+
+    <div id="boxMemoForm" class="bg-white rounded-2xl max-w-md w-full shadow-xl border p-6 space-y-4 hidden text-xs">
+       <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-bullhorn text-amber-500 mr-2"></i>Rilis Memo Internal Baru</h3>
+       <form onsubmit="submitMemoBaru(event)" class="space-y-3">
+         <div><label class="block font-medium mb-1">Judul Pengumuman/Memo</label><input type="text" id="addMemoJudul" required class="w-full p-2.5 border rounded-xl" placeholder="Contoh: Penyesuaian Jam Shift Lembur"></div>
+         <div><label class="block font-medium mb-1">Isi Pesan Pendek</label><textarea id="addMemoTeks" required class="w-full p-2.5 border rounded-xl h-24" placeholder="Tuliskan pesan instruksi resmi di sini..."></textarea></div>
+         <div class="flex justify-end space-x-2 pt-2">
+           <button type="button" onclick="tutupModal('modalAdminForm')" class="px-4 py-2 bg-slate-100 rounded-xl">Batal</button>
+           <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl">Sebarkan Memo</button>
+         </div>
+       </form>
     </div>
   </div>
 
-  <div id="modalTambahLine" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl shadow-2xl max-w-xs w-full p-5 text-xs space-y-3">
-      <div class="flex justify-between items-center border-b pb-1 font-bold uppercase">
-        <h3>Aktifkan Lini Produksi</h3>
-        <button onclick="tutupModal('modalTambahLine')" class="text-slate-400 font-bold">&times;</button>
-      </div>
-      <input type="text" id="lLine" placeholder="Contoh: LINE ALAT STIK GLUCOSE / VENTILATOR" class="w-full border p-2 rounded uppercase font-bold">
-      <select id="lJenis" class="w-full border p-2 rounded bg-white">
-        <option value="IVD STRIP">IVD STRIP / GLUCOSE</option>
-        <option value="NEONATAL">EQUIPMENT NEONATAL (INCUBATOR)</option>
-        <option value="VENTILATOR">VENTILATOR HARDWARE</option>
-      </select>
-      <input type="text" id="lNamaProduk" placeholder="Nama Spesifik Produk..." class="w-full border p-2 rounded">
-      <input type="number" id="lQty" placeholder="Target Quantity" class="w-full border p-2 rounded">
-      <input type="date" id="lDeadline" class="w-full border p-2 rounded">
-      <button onclick="submitLineProduksi()" id="btnSLine" class="w-full bg-slate-950 text-white py-2 rounded font-bold uppercase">Aktifkan</button>
+  <div id="modalPin" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-xl border p-6 space-y-4 text-xs">
+       <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-key text-indigo-500 mr-2"></i>Ubah PIN Keamanan User</h3>
+       <form onsubmit="submitUbahPin(event)" class="space-y-3">
+         <div><label class="block font-medium mb-1">PIN Lama Anda</label><input type="password" id="pinLama" required class="w-full p-2.5 border rounded-xl" placeholder="••••"></div>
+         <div><label class="block font-medium mb-1">PIN Baru Anda</label><input type="password" id="pinBaru" required class="w-full p-2.5 border rounded-xl" placeholder="••••"></div>
+         <div class="flex justify-end space-x-2 pt-2">
+           <button type="button" onclick="tutupModal('modalPin')" class="px-4 py-2 bg-slate-100 rounded-xl">Batal</button>
+           <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl">Simpan PIN</button>
+         </div>
+       </form>
     </div>
   </div>
 
-  <div id="modalTambahMemo" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-5 text-xs space-y-3">
-      <div class="flex justify-between items-center border-b pb-1 font-bold uppercase">
-        <h3>Tulis Memo Internal</h3>
-        <button onclick="tutupModal('modalTambahMemo')">&times;</button>
-      </div>
-      <input type="text" id="mJudul" placeholder="Subjek / Judul Memo..." class="w-full border p-2 rounded font-bold">
-      <textarea id="mTeks" placeholder="Tulis instruksi atau pengumuman resmi di sini..." class="w-full border p-2 rounded h-24"></textarea>
-      <button onclick="submitMemo()" id="btnSMemo" class="w-full bg-blue-600 text-white py-2 rounded font-bold uppercase shadow">Siarkan Memo</button>
-    </div>
-  </div>
+<script>
+    // ===== WAJIB GANTI URL INI DENGAN URL DEPLOYMENT WEB APP YANG BARU =====
+    const API_URL = "https://script.google.com/macros/s/AKfycbxDdyGBfVIyox3Ou5WeK0NTbBTxx3KKl3IOCgqYAdKxGqSw3KzSdbeG_wMsXColRwhaDg/exec";
 
-  <div id="modalList" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-40">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col h-[80vh]">
-      <div class="px-4 py-3 border-b bg-slate-50 flex justify-between items-center font-bold text-xs text-slate-800 uppercase">
-        <h3 id="listTitle">Daftar Filter</h3>
-        <button onclick="tutupModal('modalList')" class="text-xl font-bold">&times;</button>
-      </div>
-      <div class="overflow-auto flex-1 p-4">
-        <table class="w-full text-xs text-left border-collapse border">
-          <thead>
-            <tr class="bg-slate-100 border-b font-bold text-slate-700 uppercase">
-              <th class="p-2 border">Nama</th>
-              <th class="p-2 border">Tugas</th>
-              <th class="p-2 border">Target</th>
-              <th class="p-2 border">Status</th>
-              <th class="p-2 border">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tableListBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <script>
     var dataMaster = [];
-    var curUser = { logged: false, email: '', nama: '', isAdmin: false };
+    var curUser = { logged: false, nama: "Tamu", email: "", isAdmin: false };
+    var isFetching = false;
+    var sidebarMobileOpen = false;
     var currentViewMode = 'kartu';
-    var filterKonteks = 'Semua';
-    var currentMonth = new Date().getMonth();
-    var currentYear = new Date().getFullYear();
+    var calCurrentDate = new Date();
+
+    // REST API ENGINE - Fungsi pengganti google.script.run
+    async function apiRequest(action, payload = {}) {
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: action, ...payload })
+        });
+        return await response.json();
+      } catch (err) {
+        return { success: false, message: "Koneksi ke server gagal: " + err.message };
+      }
+    }
 
     window.onload = function() {
-      startLiveClock();
-      segarkanData();
+      mulaiJam(); updateAuthUI(); segarkan();
+      setInterval(() => { if (!isFetching) segarkan(); }, 6000); // Diperlambat sedikit agar API aman
     };
 
-    function startLiveClock() {
-      setInterval(function() {
-        var d = new Date();
-        document.getElementById('liveClock').innerText = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + " | " + d.toLocaleTimeString('id-ID');
+    function mulaiJam() {
+      setInterval(() => {
+        var n = new Date();
+        document.getElementById('liveClock').innerHTML = `<i class="far fa-clock mr-2 text-blue-400"></i> ${n.toLocaleDateString('id-ID', {weekday:'short', day:'2-digit', month:'short'})} | ${n.toLocaleTimeString('id-ID', {hour12:false})}`;
       }, 1000);
     }
 
-    function segarkanData() {
-      google.script.run.withSuccessHandler(function(res) {
-        if(res.success) {
-          dataMaster = res.rawData;
-          renderUI(res);
-        } else {
-          Swal.fire('Koneksi Gagal', res.message, 'error');
-        }
-      }).ambilDataDashboard();
+    function toggleSidebarMobile() {
+      var s = document.getElementById('mainSidebar'), i = document.getElementById('hamburgerIcon');
+      sidebarMobileOpen ? (s.classList.add('-translate-x-full'), i.className="fas fa-bars") : (s.classList.remove('-translate-x-full'), i.className="fas fa-times");
+      sidebarMobileOpen = !sidebarMobileOpen;
     }
 
-    function renderUI(res) {
-      document.getElementById('txtSelesai').innerText = res.stats.selesai;
-      document.getElementById('txtBerjalan').innerText = res.stats.berjalan;
-      document.getElementById('txtApproval').innerText = res.stats.approval;
-      document.getElementById('txtReject').innerText = res.stats.reject;
-
-      // Render Memo Bulletin
-      var containerMemo = document.getElementById('teksAnn');
-      containerMemo.innerHTML = '';
-      if(res.memos.length === 0) {
-        containerMemo.innerHTML = '<p class="text-slate-400 italic">Tidak ada pengumuman terbaru.</p>';
+    function switchView(mode) {
+      currentViewMode = mode;
+      var bKartu = document.getElementById('btnViewKartu'), bKal = document.getElementById('btnViewKalender');
+      var cKartu = document.getElementById('viewKartuContainer'), cKal = document.getElementById('viewKalenderContainer');
+      
+      if(mode === 'kartu') {
+        bKartu.className = "bg-white text-slate-800 font-bold text-[11px] px-3 py-1.5 rounded-md shadow-sm uppercase tracking-wider transition";
+        bKal.className = "text-slate-600 hover:text-slate-900 font-bold text-[11px] px-3 py-1.5 rounded-md uppercase tracking-wider transition";
+        cKartu.classList.remove('hidden'); cKal.classList.add('hidden');
       } else {
-        res.memos.forEach(m => {
-          containerMemo.innerHTML += `
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg relative">
-              <h4 class="font-bold text-slate-800 text-[13px] uppercase">${m.judul} <span class="text-[9px] text-slate-400 ml-2 font-normal">${m.tgl}</span></h4>
-              <p class="mt-1 text-slate-600 whitespace-pre-line leading-relaxed">${m.teks}</p>
-              ${(curUser.logged && curUser.isAdmin) ? `<button onclick="hapusMemoUI(${m.row})" class="absolute top-2 right-2 text-rose-500 hover:text-rose-700 font-bold text-[10px] uppercase">[Hapus]</button>` : ''}
-            </div>`;
-        });
+        bKal.className = "bg-white text-slate-800 font-bold text-[11px] px-3 py-1.5 rounded-md shadow-sm uppercase tracking-wider transition";
+        bKartu.className = "text-slate-600 hover:text-slate-900 font-bold text-[11px] px-3 py-1.5 rounded-md uppercase tracking-wider transition";
+        cKartu.classList.add('hidden'); cKal.classList.remove('hidden');
+        renderKalenderTim();
       }
-
-      // Render Lini Produksi Aktif
-      var conProd = document.getElementById('containerProduksi');
-      conProd.innerHTML = '';
-      if(res.listProduksiAktif.length === 0) {
-        conProd.innerHTML = '<div class="p-3 text-center bg-white border border-dashed text-slate-400 rounded-xl">Semua Lini Produksi Kosong / Standby</div>';
-      } else {
-        res.listProduksiAktif.forEach(l => {
-          var hl = l.remStatus === "OVERDUE" ? "bg-rose-100 text-rose-700" : (l.remStatus.includes("DEADLINE") ? "bg-amber-100 text-amber-700" : "bg-emerald-50 text-emerald-700");
-          conProd.innerHTML += `
-            <div class="p-3 bg-white border rounded-xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-              <div>
-                <span class="text-[9px] bg-slate-100 border text-slate-600 font-bold px-1.5 py-0.5 rounded uppercase">${l.jenis}</span>
-                <h4 class="font-black text-slate-900 mt-1 uppercase text-sm">${l.line} <span class="text-slate-400 font-normal">| ${l.namaProduk}</span></h4>
-              </div>
-              <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                <div class="text-right"><p class="text-[9px] text-slate-400 font-bold uppercase">QTY TARGET</p><p class="font-bold">${l.qty}</p></div>
-                <div class="text-right"><p class="text-[9px] text-slate-400 font-bold uppercase">DEADLINE</p><p class="font-bold px-2 py-0.5 rounded text-[11px] ${hl}">${l.deadline} (${l.remStatus})</p></div>
-                ${(curUser.logged && curUser.isAdmin) ? `<button onclick="tutupLineUI(${l.row})" class="bg-slate-900 hover:bg-black text-white px-2 py-1 rounded text-[10px] uppercase font-bold font-mono">SELESAI</button>` : ''}
-              </div>
-            </div>`;
-        });
-      }
-
-      // Render Reminder Target & Kendala Panel Kiri
-      var boxR = document.getElementById('boxReminder'); boxR.innerHTML = '';
-      var boxK = document.getElementById('boxKendala'); boxK.innerHTML = '';
-      
-      if(res.reminders.length === 0) boxR.innerHTML = '<p class="text-slate-500 italic">Tidak ada target tertunda</p>';
-      else {
-        res.reminders.sort((a,b)=>a.diff - b.diff).slice(0,5).forEach(r => {
-          boxR.innerHTML += `<div onclick="bukaDetailTugas(${r.row})" class="p-2 border-l-4 border-amber-500 bg-amber-500/10 rounded-r mb-1 cursor-pointer hover:opacity-80">
-            <div class="flex justify-between font-bold"><span>${r.nama}</span><span class="text-amber-400">${r.statusHari}</span></div>
-            <p class="truncate text-slate-300 mt-0.5">${r.pekerjaan}</p>
-          </div>`;
-        });
-      }
-
-      if(res.kendalaAktif.length === 0) boxK.innerHTML = '<p class="text-slate-500 italic">Aman, tidak ada kendala aktif</p>';
-      else {
-        res.kendalaAktif.forEach(k => {
-          boxK.innerHTML += `<div onclick="bukaDetailTugas(${k.row})" class="p-2 border-l-4 border-rose-500 bg-rose-500/10 rounded-r mb-1 cursor-pointer hover:opacity-80">
-            <div class="font-bold flex justify-between"><span>${k.nama}</span><span class="text-rose-400">🚨 KENDALA</span></div>
-            <p class="truncate text-slate-400 mt-0.5">${k.detailKendala}</p>
-          </div>`;
-        });
-      }
-
-      // Render Main Content (Kartu / Kalender)
-      if(currentViewMode === 'kartu') renderKartuView(res.personel);
-      else renderKalenderView();
-    }
-
-    function renderKartuView(personel) {
-      var grid = document.getElementById('viewKartuContainer');
-      document.getElementById('viewKartuContainer').classList.remove('hidden');
-      document.getElementById('viewKalenderContainer').classList.add('hidden');
-      grid.innerHTML = '';
-      
-      Object.keys(personel).sort().forEach(n => {
-        var d = personel[n];
-        var pctSelesai = d.total > 0 ? Math.round((d.selesai/d.total)*100) : 0;
-        grid.innerHTML += `
-          <div onclick="bukaKonteksList('Personel', '${n}')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm card-hover flex flex-col justify-between">
-            <div class="flex justify-between items-start">
-              <div><h3 class="font-bold text-slate-800 text-sm">${n}</h3><p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">${d.total} Total Tugas</p></div>
-              <i class="fas fa-user-circle text-slate-300 text-2xl"></i>
-            </div>
-            <div class="flex gap-1 my-3 flex-wrap text-[9px] font-bold uppercase">
-              <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded">${d.selesai} Selesai</span>
-              <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded">${d.berjalan} Progres</span>
-              ${d.kendala > 0 ? `<span class="px-2 py-0.5 bg-rose-100 text-rose-700 rounded animate-pulse">${d.kendala} Kendala</span>` : ''}
-            </div>
-            <div class="w-full bg-slate-100 rounded-full h-2 mt-2">
-              <div class="bg-blue-600 h-2 rounded-full" style="width: ${pctSelesai}%"></div>
-            </div>
-          </div>`;
-      });
-    }
-
-    function renderKalenderView() {
-      document.getElementById('viewKartuContainer').classList.add('hidden');
-      document.getElementById('viewKalenderContainer').classList.remove('hidden');
-      
-      var mNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-      document.getElementById('calMonthTitle').innerText = mNames[currentMonth] + " " + currentYear;
-      
-      var grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
-      var firstDay = new Date(currentYear, currentMonth, 1).getDay();
-      var totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-      for (var i = 0; i < firstDay; i++) { grid.innerHTML += `<div class="bg-slate-50 border border-slate-100 rounded-lg p-1"></div>`; }
-
-      for (var day = 1; day <= totalDays; day++) {
-        var matchDateStr = currentYear + "-" + String(currentMonth + 1).padStart(2, '0') + "-" + String(day).padStart(2, '0');
-        var htmlTugas = '';
-        
-        dataMaster.forEach(t => {
-          var currentTarget = t.revisiTargetIso || t.targetIso;
-          if (currentTarget === matchDateStr) {
-            var badgeC = t.status === "Selesai" ? 'bg-emerald-500' : 'bg-blue-500';
-            htmlTugas += `<div onclick="event.stopPropagation(); bukaDetailTugas(${t.row})" class="${badgeC} text-white font-bold text-[8px] px-1 py-0.5 rounded mb-0.5 truncate uppercase cursor-pointer" title="${t.pekerjaan}">${t.nama}: ${t.pekerjaan}</div>`;
-          }
-        });
-
-        grid.innerHTML += `
-          <div class="bg-white border rounded-lg p-1 overflow-hidden flex flex-col justify-between">
-            <span class="text-[10px] font-black text-slate-400 ml-1">${day}</span>
-            <div class="overflow-y-auto flex-1 mt-1 scrollbar-none">${htmlTugas}</div>
-          </div>`;
-      }
-    }
-
-    // === POPUP DAN FILTER ACTION ===
-    function bukaKonteksList(tipe, payload = '') {
-      filterKonteks = tipe;
-      var title = document.getElementById('listTitle');
-      var body = document.getElementById('tableListBody');
-      body.innerHTML = '';
-      tutupModal('modalList');
-
-      var listFiltered = [];
-      if(tipe === 'Personel') { title.innerText = "TUGAS: " + payload; listFiltered = dataMaster.filter(x => x.nama === payload); }
-      else { title.innerText = "STATUS: " + tipe; listFiltered = dataMaster.filter(x => x.status === tipe); }
-
-      if(listFiltered.length === 0) {
-        body.innerHTML = '<tr><td colspan="5" class="p-3 text-center italic text-slate-400">Tidak ada penugasan</td></tr>';
-      } else {
-        listFiltered.forEach(t => {
-          body.innerHTML += `
-            <tr class="border-b hover:bg-slate-50 cursor-pointer" onclick="bukaDetailTugas(${t.row})">
-              <td class="p-2 font-bold">${t.nama}</td>
-              <td class="p-2 font-medium">${t.pekerjaan}</td>
-              <td class="p-2">${t.revisiTarget ? `<span class="line-through text-slate-400">${t.targetSelesai}</span> <span class="text-rose-600 font-bold">${t.revisiTarget}</span>` : t.targetSelesai}</td>
-              <td class="p-2"><span class="px-1.5 py-0.5 rounded font-bold text-[10px] uppercase bg-slate-100">${t.status}</span></td>
-              <td class="p-2" onclick="event.stopPropagation()">
-                ${(t.status !== 'Selesai' && t.status !== 'Menunggu Approval' && (!curUser.logged || curUser.nama === t.nama || curUser.isAdmin)) ? `<button onclick="aksiBukaUpdateModal(${t.row})" class="bg-blue-600 text-white px-2 py-0.5 rounded font-bold uppercase text-[9px]">Update</button>` : '-'}
-              </td>
-            </tr>`;
-        });
-      }
-      bukaModal('modalList');
-    }
-
-    function bukaDetailTugas(row) {
-      var p = dataMaster.find(x => x.row === row);
-      if(!p) return;
-      document.getElementById('dtNama').innerText = p.nama;
-      document.getElementById('dtTarget').innerText = p.revisiTarget ? p.targetSelesai + " (Reschedule: " + p.revisiTarget + ")" : p.targetSelesai;
-      document.getElementById('dtKerja').innerText = p.pekerjaan;
-      document.getElementById('dtDetailKerja').innerText = p.detailPekerjaan;
-      
-      var badge = document.getElementById('dtStatusBadge');
-      badge.innerText = p.status;
-      badge.className = "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded " + (p.status === 'Selesai' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700');
-
-      if(p.kendala === "Ada") {
-        document.getElementById('dtBoxKendala').classList.remove('hidden');
-        document.getElementById('dtKendalaInfo').innerText = p.detailKendala;
-        document.getElementById('dtSolusiInfo').innerText = p.solusi;
-      } else { document.getElementById('dtBoxKendala').classList.add('hidden'); }
-
-      if(p.catatanAdmin) {
-        document.getElementById('dtBoxAdmin').classList.remove('hidden');
-        document.getElementById('dtCatatanAdmin').innerText = p.catatanAdmin;
-      } else { document.getElementById('dtBoxAdmin').classList.add('hidden'); }
-
-      if(p.bukti) {
-        document.getElementById('dtBoxLampiran').classList.remove('hidden');
-        document.getElementById('dtLinkLampiran').href = p.bukti;
-      } else { document.getElementById('dtBoxLampiran').classList.add('hidden'); }
-
-      var admArea = document.getElementById('adminActionArea');
-      admArea.innerHTML = '';
-      if(curUser.logged && curUser.isAdmin) {
-        document.getElementById('adminActionArea').classList.remove('hidden');
-        if(p.status === "Menunggu Approval") {
-          admArea.innerHTML += `<button onclick="approvalActionUI(${p.row}, 'Selesai')" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded">APPROVE ✓</button>`;
-          admArea.innerHTML += `<button onclick="approvalActionUI(${p.row}, 'Ditolak/Revisi')" class="bg-rose-600 text-white font-bold px-2 py-1 rounded">REVISI ✕</button>`;
-        }
-        admArea.innerHTML += `<button onclick="hapusTugasUI(${p.row})" class="text-slate-400 font-bold ml-4">Hapus Permanen</button>`;
-      } else { document.getElementById('adminActionArea').classList.add('hidden'); }
-
-      bukaModal('modalDetailInfo');
-    }
-
-    function aksiBukaUpdateModal(row) {
-      if(!curUser.logged) { return Swal.fire('Akses Dikunci', 'Silakan Login Staff Terlebih Dahulu', 'warning'); }
-      var p = dataMaster.find(x => x.row === row);
-      if(curUser.nama !== p.nama && !curUser.isAdmin) { return Swal.fire('Akses Ditolak', 'Anda hanya bisa mengubah progres tugas Anda sendiri.', 'error'); }
-      
-      document.getElementById('uRow').value = p.row;
-      document.getElementById('uPekerjaanLbl').innerText = p.pekerjaan;
-      document.getElementById('uStatus').value = p.status;
-      document.getElementById('uKendala').value = p.kendala;
-      toggleKendalaInput();
-      bukaModal('modalUpdate');
-    }
-
-    function toggleKendalaInput() {
-      if(document.getElementById('uKendala').value === "Ada") {
-        document.getElementById('boxKInput').classList.remove('hidden');
-      } else { document.getElementById('boxKInput').classList.add('hidden'); }
-    }
-
-    // === SUBMIT & ACTION CONTROLLERS ===
-    function finalSimpanUpdate() {
-      var row = document.getElementById('uRow').value;
-      var status = document.getElementById('uStatus').value;
-      var kendala = document.getElementById('uKendala').value;
-      var masalah = document.getElementById('uMasalah').value;
-      var solusi = document.getElementById('uSolusi').value;
-      var revisi = document.getElementById('uRevisi').value;
-      var fileEl = document.getElementById('uBuktiFile').files[0];
-
-      Swal.fire({ title: 'Menyimpan progres...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-
-      if (fileEl) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-          executeBackendUpdate(row, status, kendala, masalah, solusi, revisi, e.target.result, fileEl.name);
-        };
-        reader.readAsDataURL(fileEl);
-      } else {
-        executeBackendUpdate(row, status, kendala, masalah, solusi, revisi, "", "");
-      }
-    }
-
-    function executeBackendUpdate(row, status, kendala, masalah, solusi, revisi, b64, fName) {
-      google.script.run.withSuccessHandler(function(res){
-        Swal.close();
-        if(res.success) {
-          Swal.fire('Berhasil', 'Progres lapangan diperbarui.', 'success');
-          tutupModal('modalUpdate'); tutupModal('modalList');
-          segarkanData();
-        } else { Swal.fire('Gagal', res.message, 'error'); }
-      }).simpanUpdateProgres(row, status, kendala, masalah, solusi, revisi, b64, fName, curUser.email);
-    }
-
-    function approvalActionUI(row, statusAkhir) {
-      Swal.fire({
-        title: statusAkhir === "Selesai" ? 'Approve Tugas?' : 'Minta Revisi Tugas?',
-        input: 'text',
-        inputLabel: 'Tulis Catatan / Alasan Verifikasi:',
-        inputPlaceholder: 'Opsional...',
-        showCancelButton: true,
-        confirmButtonColor: '#2563eb'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          google.script.run.withSuccessHandler(function(res){
-            if(res.success) {
-              Swal.fire('Terverifikasi', 'Status berhasil diubah.', 'success');
-              tutupModal('modalDetailInfo'); tutupModal('modalList');
-              segarkanData();
-            }
-          }).prosesApprovalAdmin(row, statusAkhir, result.value || "Disetujui oleh manajemen.", curUser.email);
-        }
-      });
-    }
-
-    function submitBaru() {
-      var d = {
-        nama: document.getElementById('tNama').value,
-        pekerjaan: document.getElementById('tKerja').value,
-        detail: document.getElementById('tDetail').value,
-        target: document.getElementById('tTgl').value
-      };
-      google.script.run.withSuccessHandler(function(){
-        tutupModal('modalTambah'); segarkanData();
-        Swal.fire('Sukses', 'Tugas berhasil didelegasikan.', 'success');
-      }).simpanDataBaru(d, curUser.email || "Anonim Admin");
-    }
-
-    function submitLineProduksi() {
-      var l = document.getElementById('lLine').value;
-      var j = document.getElementById('lJenis').value;
-      var n = document.getElementById('lNamaProduk').value;
-      var q = document.getElementById('lQty').value;
-      var d = document.getElementById('lDeadline').value;
-      google.script.run.withSuccessHandler(function(){
-        tutupModal('modalTambahLine'); segarkanData();
-        Swal.fire('Lini Aktif', 'Lini produksi berhasil dipublikasi.', 'success');
-      }).tambahLineProduksi(l, j, n, q, d, curUser.email);
-    }
-
-    function tutupLineUI(row) {
-      google.script.run.withSuccessHandler(function(){ segarkanData(); }).selesaikanLine(row, curUser.email);
-    }
-
-    function submitMemo() {
-      google.script.run.withSuccessHandler(function(){
-        tutupModal('modalTambahMemo'); segarkanData();
-        Swal.fire('Disiarkan', 'Memo internal diperbarui.', 'success');
-      }).tambahMemo(document.getElementById('mJudul').value, document.getElementById('mTeks').value, curUser.email);
-    }
-
-    function hapusMemoUI(row) {
-      google.script.run.withSuccessHandler(function(){ segarkanData(); }).hapusMemo(row, curUser.email);
-    }
-
-    function hapusTugasUI(row) {
-      Swal.fire({ title: 'Hapus Tugas?', text: "Data akan hilang permanen!", icon: 'warning', showCancelButton: true }).then((r) => {
-        if(r.isConfirmed) {
-          google.script.run.withSuccessHandler(function(){
-            tutupModal('modalDetailInfo'); tutupModal('modalList'); segarkanData();
-          }).hapusTugasAdmin(row, curUser.email);
-        }
-      });
-    }
-
-    // === SECURITY LOG IN/OUT UI HANDLERS ===
-    function prosesLogin() {
-      var em = document.getElementById('loginEmail').value;
-      var pi = document.getElementById('loginPin').value;
-      document.getElementById('loginErrorMsg').innerText = "Memverifikasi...";
-      
-      google.script.run.withSuccessHandler(function(res){
-        if(res.success) {
-          curUser = { logged: true, email: res.email, nama: res.nama, isAdmin: res.isAdmin };
-          document.getElementById('loginErrorMsg').innerText = "";
-          tutupModal('modalLogin');
-          updateAuthUI();
-          segarkanData();
-          Swal.fire('Selamat Datang', 'Login berhasil sebagai ' + res.nama, 'success');
-        } else {
-          document.getElementById('loginErrorMsg').innerText = res.message;
-        }
-      }).verifikasiLogin(em, pi);
-    }
-
-    function prosesLogout() {
-      curUser = { logged: false, email: '', nama: '', isAdmin: false };
-      updateAuthUI();
-      segarkanData();
-      Swal.fire('Logged Out', 'Sesi Anda telah berakhir.', 'info');
     }
 
     function updateAuthUI() {
       var area = document.getElementById('authStatusArea');
       if (curUser.logged) {
         area.innerHTML = `
-          <button onclick="document.getElementById('dropdownMenu').classList.toggle('hidden'); event.stopPropagation();" class="text-[11px] font-black bg-white px-3 py-2 rounded-lg border shadow-sm flex items-center gap-1.5 uppercase hover:bg-slate-50">
-            <span class="text-blue-600">${curUser.nama}</span> <i class="fas fa-caret-down text-slate-400"></i>
+          <button onclick="document.getElementById('userMenuDropdown').classList.toggle('hidden'); event.stopPropagation();" class="text-[11px] font-bold bg-white px-3 py-2.5 rounded-lg border shadow-sm flex items-center gap-2 hover:bg-slate-50 transition">
+            USER: <span class="text-blue-600 uppercase font-black">${curUser.nama}</span> <i class="fas fa-caret-down text-slate-400 ml-1"></i>
           </button>
-          <div id="dropdownMenu" class="hidden absolute right-0 top-10 w-36 bg-white border rounded-lg shadow-xl z-50 overflow-hidden text-[11px] font-bold uppercase tracking-wider">
-            <button onclick="prosesLogout()" class="w-full text-left px-4 py-2.5 text-rose-600 hover:bg-rose-50"><i class="fas fa-sign-out-alt mr-1"></i> Keluar</button>
-          </div>`;
-        if (curUser.isAdmin) {
-          document.getElementById('btnTambahLine').classList.remove('hidden');
-          document.getElementById('btnEditAnn').classList.remove('hidden');
-        }
+          <div id="userMenuDropdown" class="hidden absolute right-0 top-12 mt-1 w-40 bg-white border border-slate-200 rounded-lg shadow-xl z-[100] overflow-hidden">
+            <button onclick="bukaModal('modalGantiPin')" class="w-full text-left px-4 py-3 text-[11px] font-bold text-slate-700 hover:bg-slate-100 uppercase tracking-widest border-b"><i class="fas fa-key mr-2 text-slate-400"></i>Ganti PIN</button>
+            <button onclick="prosesLogout()" class="w-full text-left px-4 py-3 text-[11px] font-bold text-rose-600 hover:bg-rose-50 uppercase tracking-widest"><i class="fas fa-sign-out-alt mr-2"></i>Keluar</button>
+          </div>
+        `;
+        document.getElementById('btnTambahLine').classList.remove('hidden');
+        if (curUser.isAdmin) document.getElementById('btnEditAnn').classList.remove('hidden');
       } else {
-        area.innerHTML = `<button onclick="bukaModal('modalLogin')" class="bg-slate-900 text-white font-bold text-[11px] px-3 py-2 rounded-lg shadow-sm"><i class="fas fa-sign-in-alt mr-1"></i> LOGIN STAFF</button>`;
+        area.innerHTML = `<button onclick="bukaModal('modalLogin')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-[11px] px-3 py-2.5 rounded-lg shadow-sm whitespace-nowrap"><i class="fas fa-sign-in-alt mr-1"></i> Login Staff</button>`;
         document.getElementById('btnTambahLine').classList.add('hidden');
         document.getElementById('btnEditAnn').classList.add('hidden');
       }
     }
 
-    function changeMonth(dir) { currentMonth += dir; if(currentMonth<0){currentMonth=11; currentYear--;} else if(currentMonth>11){currentMonth=0; currentYear++;} renderKalenderView(); }
-    function switchViewMode(mode) { currentViewMode = mode; segarkanData(); }
-    function toggleSidebarMobile() { document.getElementById('mainSidebar').classList.toggle('-translate-x-full'); }
+    function tutupDropdownUser(e) {
+      var d = document.getElementById('userMenuDropdown');
+      if(d && !d.classList.contains('hidden')) d.classList.add('hidden');
+    }
+
+    function lupaPinAlert() {
+      Swal.fire({ icon: 'info', title: 'Lupa PIN?', text: 'Silakan hubungi Administrator Sistem untuk mereset PIN Anda.', confirmButtonColor: '#2563eb' });
+    }
+
+    async function prosesLogin() {
+      var e = document.getElementById('loginEmail').value, p = document.getElementById('loginPin').value;
+      if (!e || !p) { document.getElementById('loginErrorMsg').innerText = "Wajib diisi!"; return; }
+      var btn = document.getElementById('btnLoginSubmit');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Memverifikasi...';
+      
+      const res = await apiRequest('verifikasiLogin', { email: e, pin: p });
+      btn.disabled = false; btn.innerText = "Masuk Sistem";
+      
+      if (res.success) { 
+        curUser = res; curUser.logged = true; 
+        tutupModal('modalLogin'); updateAuthUI(); segarkan(); 
+        document.getElementById('loginPin').value=''; 
+      } else { 
+        document.getElementById('loginErrorMsg').innerText = res.message; 
+      }
+    }
+
+    async function submitGantiPin() {
+      var pL = document.getElementById('pinLama').value, pB = document.getElementById('pinBaru').value;
+      if(!pL || !pB) return alert("Isi semua kolom PIN!");
+      setL('btnSgantiPin', true);
+      
+      const res = await apiRequest('updatePinUser', { email: curUser.email, pinLama: pL, pinBaru: pB });
+      setL('btnSgantiPin', false, 'Update PIN');
+      
+      if(res.success) { 
+        Swal.fire('Berhasil', res.message, 'success'); 
+        tutupModal('modalGantiPin'); 
+        document.getElementById('pinLama').value=''; document.getElementById('pinBaru').value=''; 
+      } else { 
+        Swal.fire('Gagal', res.message, 'error'); 
+      }
+    }
+
+    function prosesLogout() { curUser = { logged: false, nama: "Tamu", email: "", isAdmin: false }; updateAuthUI(); segarkan(); }
+    
+    async function segarkan() {
+      isFetching = true;
+      const res = await apiRequest('ambilDataDashboard');
+      isFetching = false; 
+      
+      if(!res.success) return;
+      dataMaster = res.rawData;
+
+      // 1. Render Produksi
+      var conProd = document.getElementById('containerProduksi'); conProd.innerHTML = '';
+      if(res.listProduksiAktif.length === 0) { 
+        conProd.innerHTML = `<div class="p-4 rounded-xl border bg-slate-50 border-slate-200 text-center text-slate-500 font-bold italic text-sm">TIDAK ADA LINE PRODUKSI AKTIF</div>`; 
+      } else {
+        res.listProduksiAktif.forEach(l => {
+          var iconType = l.jenis === 'Elektromedik' ? 'fa-bolt text-amber-500' : 'fa-box text-blue-500';
+          var dlHighlightClass = "text-slate-800 font-extrabold";
+          var labelUrgent = "";
+          if(l.remStatus === "OVERDUE") {
+            dlHighlightClass = "text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md font-black pulse-green";
+            labelUrgent = `<span class="text-[8px] bg-rose-600 text-white font-bold px-1.5 py-0.5 rounded uppercase tracking-wider block text-center mt-1">Terlewat!</span>`;
+          } else if(l.remStatus === "DEADLINE HARI INI" || l.remStatus === "DEKAT DEADLINE") {
+            dlHighlightClass = "text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md font-black";
+            labelUrgent = `<span class="text-[8px] bg-amber-500 text-white font-bold px-1.5 py-0.5 rounded uppercase tracking-wider block text-center mt-1">Mendekati!</span>`;
+          }
+          conProd.innerHTML += `
+          <div class="p-4 rounded-xl border bg-white shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shadow-inner shrink-0"><i class="fas ${iconType} text-lg"></i></div>
+              <div><span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${l.jenis}</span><h2 class="text-sm font-black uppercase text-emerald-900">${l.line} <span class="text-slate-500 font-medium">| ${l.namaProduk}</span></h2></div>
+            </div>
+            <div class="flex gap-6 items-center w-full md:w-auto justify-between md:justify-end shrink-0">
+              <div class="text-right"><p class="text-[9px] font-bold text-slate-400 uppercase">Target Qty</p><p class="font-bold text-slate-800 text-xs">${l.qty}</p></div>
+              <div class="text-right"><p class="text-[9px] font-bold text-slate-400 uppercase">Deadline</p><p class="${dlHighlightClass} text-xs">${l.deadline}</p>${labelUrgent}</div>
+              ${(curUser.logged && curUser.isAdmin) ? `<button onclick="selesaikanLineUI(${l.row})" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] px-3 py-2 rounded uppercase border transition shadow-sm">Selesaikan</button>` : ''}
+            </div>
+          </div>`;
+        });
+      }
+
+      // 2. Render Memo
+      var bMemo = document.getElementById('teksAnn'); 
+      bMemo.innerHTML = `<div class="mb-3 border-b border-slate-100 pb-2"><h4 class="font-bold text-blue-800 text-xs uppercase">AUTO-MEMO SISTEM <span class="text-[9px] font-normal text-slate-500 ml-1">Hari Ini</span></h4><p class="text-xs text-slate-600 mt-0.5 leading-relaxed">Wajib update pekerjaan sebelum jam 17.30 WIB. Terimakasih</p></div>`; 
+      
+      if(res.memos.length > 0) { 
+        res.memos.forEach(m => {
+          var btnHapusMemo = (curUser.logged && curUser.isAdmin) ? `<button onclick="hapusMemoUI(${m.row})" class="text-rose-500 hover:text-rose-700 font-black text-[9px] uppercase tracking-wider border border-rose-200 hover:border-rose-400 px-2 py-0.5 rounded bg-rose-50/50 transition cursor-pointer"><i class="fas fa-trash-alt mr-1"></i>Hapus</button>` : '';
+          bMemo.innerHTML += `
+          <div class="mb-3 border-b border-slate-100 pb-2 last:border-0 last:pb-0 last:mb-0 flex justify-between items-start gap-4">
+            <div class="flex-1">
+              <h4 class="font-bold text-blue-800 text-xs uppercase">${m.judul} <span class="text-[9px] font-normal text-slate-500 ml-1">${m.tgl}</span></h4>
+              <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">${m.teks.replace(/\n/g, '<br>')}</p>
+            </div>
+            <div class="shrink-0 pt-1">${btnHapusMemo}</div>
+          </div>`;
+        }); 
+      }
+
+      // 3. Render Kendala
+      var boxK = document.getElementById('boxKendala'); boxK.innerHTML = '';
+      if(res.kendalaAktif.length === 0) boxK.innerHTML = '<p class="text-[10px] text-slate-500 italic text-center py-2 bg-slate-800/40 rounded border border-slate-700">Aman Terkendali</p>';
+      else {
+        res.kendalaAktif.forEach(k => {
+          boxK.innerHTML += `<div onclick="lihatDetailTugas(${k.row})" class="bg-rose-500/10 border-l-4 border-rose-500 p-2.5 rounded-r text-[11px] cursor-pointer hover:bg-rose-500/20 transition mb-2 shadow-sm">
+            <div class="flex justify-between font-bold text-rose-400 uppercase"><span>${k.nama}</span><span class="text-[9px] bg-rose-900/40 px-1 rounded text-white"><i class="fas fa-search"></i> KLIK</span></div>
+            <p class="text-slate-200 truncate mt-0.5"><i class="fas fa-exclamation-triangle mr-1 text-rose-500"></i> ${k.pekerjaan}</p>
+          </div>`;
+        });
+      }
+
+      // 4. Render Reminder
+      var boxR = document.getElementById('boxReminder'); boxR.innerHTML = '';
+      if(res.reminders.length === 0) boxR.innerHTML = '<p class="text-[10px] text-slate-500 italic text-center py-2 bg-slate-800/40 rounded border border-slate-700">Tidak ada target aktif</p>';
+      else {
+        res.reminders.sort((a,b) => a.diff - b.diff).forEach(r => {
+          var isDekat = r.diff <= 1; var cBg = isDekat ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-blue-500/10 border-blue-500 text-blue-400';
+          boxR.innerHTML += `<div onclick="lihatDetailTugas(${r.row})" class="${cBg} border-l-4 p-2.5 rounded-r text-[11px] cursor-pointer hover:opacity-80 transition mb-2 shadow-sm">
+            <div class="flex justify-between font-bold uppercase"><span>${r.nama}</span><span>${r.statusHari}</span></div>
+            <p class="text-slate-300 truncate mt-0.5">${r.pekerjaan}</p>
+          </div>`;
+        });
+      }
+
+      // 5. Render Stats & Kartu
+      document.getElementById('txtSelesai').innerText = res.stats.selesai;
+      document.getElementById('txtBerjalan').innerText = res.stats.berjalan;
+      document.getElementById('txtApproval').innerText = res.stats.approval;
+      document.getElementById('txtReject').innerText = res.stats.reject;
+
+      var grid = document.getElementById('viewKartuContainer'); grid.innerHTML = '';
+      var arrPersonel = Object.keys(res.personel).sort();
+      arrPersonel.forEach(n => {
+        var d = res.personel[n];
+        var pS = Math.round((d.selesai/d.total)*100), pB = Math.round((d.berjalan/d.total)*100);
+        grid.innerHTML += `<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm card-hover flex flex-col justify-between" onclick="bukaListDetail('${n}')">
+          <div class="flex justify-between items-start"><div><h3 class="font-bold text-slate-800 text-sm">${n}</h3><p class="text-[9px] text-slate-400 uppercase font-bold tracking-wider">${d.total} Tugas Total</p></div><i class="fas fa-user-circle text-slate-300 text-2xl"></i></div>
+          <div class="flex gap-1.5 my-3 text-[9px] font-bold uppercase flex-wrap">
+            <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">${d.selesai} Selesai</span>
+            <span class="text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">${d.berjalan} Progres</span>
+            ${d.kendala > 0 ? `<span class="text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 animate-pulse">${d.kendala} Kendala</span>` : ''}
+          </div>
+          <div class="w-full bg-slate-100 h-1.5 rounded-full flex overflow-hidden"><div class="bg-emerald-500 h-full" style="width:${pS}%"></div><div class="bg-blue-400 h-full" style="width:${pB}%"></div></div></div>`;
+      });
+
+      if(currentViewMode === 'kalender') renderKalenderTim();
+    }
+
+    function changeMonth(dir) {
+      calCurrentDate.setMonth(calCurrentDate.getMonth() + dir);
+      renderKalenderTim();
+    }
+
+    function renderKalenderTim() {
+      var grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+      var y = calCurrentDate.getFullYear(), m = calCurrentDate.getMonth();
+      
+      var namaBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+      document.getElementById('calMonthTitle').innerText = namaBulan[m] + " " + y;
+      
+      var firstDay = new Date(y, m, 1).getDay();
+      var totalDays = new Date(y, m + 1, 0).getDate();
+      
+      for(var i=0; i<firstDay; i++) { grid.innerHTML += `<div class="bg-slate-50/50 border border-slate-100 rounded p-1"></div>`; }
+      
+      for(var d=1; d<=totalDays; d++) {
+        var dayStr = y + "-" + String(m+1).padStart(2,'0') + "-" + String(d).padStart(2,'0');
+        var tugasHariIni = dataMaster.filter(x => x.targetIso === dayStr || x.revisiTargetIso === dayStr);
+        var htmlTugas = "";
+        
+        tugasHariIni.forEach(t => {
+          var cBadge = t.status === 'Selesai' ? 'bg-emerald-500' : (t.kendala === 'Ada' ? 'bg-rose-500 animate-pulse' : 'bg-blue-500');
+          htmlTugas += `<div onclick="event.stopPropagation(); lihatDetailTugas(${t.row})" class="${cBadge} text-white font-bold text-[8px] px-1 py-0.5 rounded truncate mb-0.5 cursor-pointer uppercase shadow-[0_1px_2px_rgba(0,0,0,0.1)]" title="${t.nama}: ${t.pekerjaan}">
+            ${t.nama.split(' ')[0]}: ${t.pekerjaan}
+          </div>`;
+        });
+
+        grid.innerHTML += `
+          <div class="bg-white border border-slate-200 rounded p-1 flex flex-col justify-between overflow-hidden hover:shadow-inner transition">
+            <span class="text-[10px] font-black text-slate-700 block text-left">${d}</span>
+            <div class="flex-1 overflow-y-auto pr-0.5 space-y-0.5 mt-1 select-none scrollbar-none">${htmlTugas}</div>
+          </div>`;
+      }
+    }
+
+    function lihatDetailTugas(row) {
+      var p = dataMaster.find(x => x.row === row);
+      if(!p) return;
+      document.getElementById('dtNama').innerText = p.nama;
+      document.getElementById('dtKerja').innerText = p.pekerjaan;
+      document.getElementById('dtDetailKerja').innerText = p.detailPekerjaan;
+      document.getElementById('dtTarget').innerText = p.revisiTarget ? p.targetSelesai + " (Rev: " + p.revisiTarget + ")" : p.targetSelesai;
+      
+      var sBadge = document.getElementById('dtStatusBadge');
+      sBadge.innerText = p.status;
+      sBadge.className = "text-[10px] font-bold uppercase tracking-wider mt-0.5 inline-block px-2 py-0.5 rounded " + (p.status === "Selesai" ? 'bg-emerald-100 text-emerald-700' : (p.status === "Menunggu Approval" ? 'bg-amber-100 text-amber-700' : (p.status === "Ditolak/Revisi" ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700')));
+
+      var today = new Date(); today.setHours(0,0,0,0);
+      var tglCheck = p.revisiTargetIso || p.targetIso;
+      var targetDate = new Date(tglCheck); targetDate.setHours(0,0,0,0);
+      var diffDays = Math.round((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      var cardCont = document.getElementById('cardDetailContainer');
+      if (diffDays <= 2) { cardCont.className = "bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden relative border-t-8 border-t-amber-400"; } 
+      else { cardCont.className = "bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden relative border-t-8 border-t-blue-600"; }
+
+      if(p.kendala === "Ada") {
+        document.getElementById('dtBoxKendala').classList.remove('hidden');
+        document.getElementById('dtKendalaInfo').innerText = p.detailKendala || "Tidak ada rincian masalah.";
+        if(p.solusi) { 
+           document.getElementById('dtBoxSolusi').classList.remove('hidden'); 
+           document.getElementById('dtSolusiInfo').innerText = p.solusi; 
+        } else { document.getElementById('dtBoxSolusi').classList.add('hidden'); }
+      } else { document.getElementById('dtBoxKendala').classList.add('hidden'); }
+
+      if(p.bukti) {
+        document.getElementById('dtBoxLampiran').classList.remove('hidden');
+        document.getElementById('dtLinkLampiran').href = p.bukti;
+      } else { document.getElementById('dtBoxLampiran').classList.add('hidden'); }
+
+      if(p.catatanAdmin) {
+        document.getElementById('dtBoxAdmin').classList.remove('hidden');
+        document.getElementById('dtCatatanAdmin').innerText = p.catatanAdmin;
+      } else { document.getElementById('dtBoxAdmin').classList.add('hidden'); }
+
+      bukaModal('modalDetailInfo');
+    }
+
+    function bukaListStatus(statusTarget) {
+      document.getElementById('listTitle').innerText = "DAFTAR TUGAS STATUS: " + statusTarget.toUpperCase();
+      var body = document.getElementById('listBody'); body.innerHTML = '';
+      var dataFilter = dataMaster.filter(i => i.status === statusTarget);
+      renderTabelUniversal(dataFilter, body, statusTarget); 
+      bukaModal('modalList');
+    }
+
+    function bukaListDetail(nama) {
+      document.getElementById('listTitle').innerText = "RIWAYAT PEKERJAAN: " + nama;
+      var body = document.getElementById('listBody'); body.innerHTML = '';
+      var dataFilter = dataMaster.filter(i => i.nama === nama);
+      renderTabelUniversal(dataFilter, body, "Semua"); 
+      bukaModal('modalList');
+    }
+
+    function renderTabelUniversal(tasks, bodyElement, konteksView) {
+      if(tasks.length === 0) {
+        bodyElement.innerHTML = `<tr><td colspan="4" class="p-8 text-center font-bold text-slate-400 bg-slate-50 italic">Tidak ada data penugasan ditemukan.</td></tr>`;
+        return;
+      }
+      
+      tasks.forEach(p => {
+        var isK = p.kendala === "Ada";
+        var stClass = p.status === "Selesai" ? 'bg-emerald-100 text-emerald-700' : (p.status === "Menunggu Approval" ? 'bg-amber-100 text-amber-700' : (p.status === "Ditolak/Revisi" ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'));
+        var linkBukti = p.bukti ? `<a href="${p.bukti}" target="_blank" class="text-blue-600 hover:text-blue-800 font-extrabold text-[10px] uppercase mt-1.5 flex items-center gap-1" onclick="event.stopPropagation()"><i class="fas fa-external-link-alt"></i> Buka Lampiran</a>` : '<span class="text-slate-400 text-[10px] block mt-1">Tanpa Lampiran</span>';
+        
+        var btnAksi = '';
+        if (konteksView !== "Menunggu Approval" && konteksView !== "Ditolak/Revisi") {
+          if (p.status !== "Menunggu Approval" && p.status !== "Selesai") {
+            btnAksi = `<button onclick="event.stopPropagation(); persiapkanUpdate(${p.row})" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition shadow-sm">Update</button>`;
+          }
+        }
+        
+        var adminActionArea = '';
+        if(curUser.logged && curUser.isAdmin) {
+          var btnApprove = '';
+          if (p.status === "Menunggu Approval") {
+            btnApprove = `
+               <button onclick="event.stopPropagation(); aksiApproval(${p.row}, 'Selesai')" class="bg-emerald-500 hover:bg-emerald-600 text-white w-7 h-7 rounded shadow-sm text-xs transition flex items-center justify-center" title="Approve Tugas"><i class="fas fa-check"></i></button>
+               <button onclick="event.stopPropagation(); aksiApproval(${p.row}, 'Ditolak/Revisi')" class="bg-rose-500 hover:bg-rose-600 text-white w-7 h-7 rounded shadow-sm text-xs transition flex items-center justify-center" title="Tolak / Minta Revisi"><i class="fas fa-times"></i></button>
+            `;
+          }
+          adminActionArea = `
+            <div class="flex items-center gap-1 justify-center mt-2 border-t pt-2 border-slate-100">
+              ${btnApprove}
+              <button onclick="event.stopPropagation(); hapusTugasUI(${p.row})" class="text-slate-400 hover:text-rose-600 w-7 h-7 rounded text-xs transition flex items-center justify-center" title="Hapus Tugas Permanen"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          `;
+        }
+        
+        bodyElement.innerHTML += `<tr class="hover:bg-slate-50 border-b border-slate-100 text-xs text-slate-700 align-top cursor-pointer transition" onclick="lihatDetailTugas(${p.row})">
+          <td class="p-3">
+            <p class="text-[10px] font-bold text-slate-400 uppercase mb-0.5">${p.nama}</p>
+            <p class="font-black text-slate-900 text-sm tracking-tight">${p.pekerjaan}</p>
+            <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-2">${p.detailPekerjaan}</p>
+            ${isK ? `<p class="text-[10px] text-rose-500 font-bold mt-1.5 flex items-center gap-1"><i class="fas fa-exclamation-triangle"></i> Masalah: ${p.detailKendala}</p>` : ''}
+          </td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${stClass}">${p.status}</span>${linkBukti}</td>
+          <td class="p-3 font-medium text-slate-600">${isK && p.revisiTarget ? `<span class="line-through text-slate-400 block">${p.targetSelesai}</span><span class="text-rose-600 font-black">${p.revisiTarget}</span>` : p.targetSelesai}</td>
+          <td class="p-3 w-28 text-center align-middle">${btnAksi}${adminActionArea}</td>
+        </tr>`;
+      });
+    }
+
+    async function aksiApproval(row, statusAkhir) {
+      var judul = statusAkhir === 'Selesai' ? 'Setujui (Approve) Tugas' : 'Tolak & Minta Revisi';
+      var tombol = statusAkhir === 'Selesai' ? 'Setuju' : 'Kirim Revisi';
+      var warna = statusAkhir === 'Selesai' ? '#10b981' : '#ef4444';
+
+      const { value: catatan } = await Swal.fire({
+        title: judul, input: 'textarea', inputLabel: 'Masukkan Alasan / Catatan Tambahan Admin', inputPlaceholder: 'Tulis instruksi atau catatan disini...',
+        showCancelButton: true, confirmButtonText: tombol, confirmButtonColor: warna, cancelButtonText: 'Batal',
+        inputValidator: (value) => { if (statusAkhir === 'Ditolak/Revisi' && !value) { return 'Wajib memberikan alasan jika menolak/revisi!' } }
+      });
+
+      if (catatan !== undefined) {
+        const res = await apiRequest('prosesApprovalAdmin', { row: row, statusAkhir: statusAkhir, catatan: catatan || "Disetujui admin.", adminEmail: curUser.email });
+        if(res.success) { 
+          Swal.fire('Terverifikasi', 'Status berhasil diubah.', 'success'); tutupModal('modalDetailInfo'); tutupModal('modalList'); segarkan(); 
+        } else { Swal.fire('Gagal!', res.message, 'error'); }
+      }
+    }
+
+    function persiapkanUpdate(row) {
+      if (!curUser.logged) { return Swal.fire('Akses Terkunci', 'Silakan login staff terlebih dahulu.', 'warning'); }
+      var p = dataMaster.find(x => x.row === row);
+      if (curUser.nama === p.nama || curUser.isAdmin) {
+        document.getElementById('uRow').value = p.row; document.getElementById('uBuktiLama').value = p.bukti;
+        document.getElementById('uPekerjaanLbl').innerText = p.pekerjaan; document.getElementById('uStatus').value = p.status;
+        document.getElementById('uKendala').value = p.kendala; document.getElementById('uMasalah').value = p.detailKendala;
+        document.getElementById('uSolusi').value = p.solusi;
+        toggleKendalaInput(); bukaModal('modalUpdate');
+      } else { Swal.fire('Ditolak', 'Anda hanya diizinkan mengubah progres tugas Anda sendiri.', 'error'); }
+    }
+
+    function toggleKendalaInput() { document.getElementById('uKendala').value === "Ada" ? document.getElementById('boxKInput').classList.remove('hidden') : document.getElementById('boxKInput').classList.add('hidden'); }
+
+    function finalSimpanUpdate() {
+      var file = document.getElementById('uBuktiFile').files[0], oldBukti = document.getElementById('uBuktiLama').value;
+      if (file && file.size > 8 * 1024 * 1024) { 
+        return Swal.fire('File Terlalu Besar', 'Maksimal ukuran file lampiran adalah 8MB. Silakan kompres foto/file Anda.', 'warning'); 
+      }
+      
+      setL('btnSUpdate', true);
+      var d = { row: document.getElementById('uRow').value, status: document.getElementById('uStatus').value, kendala: document.getElementById('uKendala').value, detailKendala: document.getElementById('uMasalah').value, solusi: document.getElementById('uSolusi').value, revisiTarget: document.getElementById('uRevisi').value, currentUserEmail: curUser.email, buktiLama: oldBukti, buktiBase64: null };
+      
+      if (file) { 
+        var r = new FileReader(); 
+        r.onload = function(e) { d.buktiBase64 = e.target.result; kirimUpdateServer(d); }; 
+        r.readAsDataURL(file); 
+      } else { kirimUpdateServer(d); }
+    }
+    
+    async function kirimUpdateServer(d) { 
+      const res = await apiRequest('verifikasiDanUpdate', { data: d });
+      setL('btnSUpdate', false, 'Simpan Perubahan'); 
+      if(res.success) { 
+        tutupModal('modalUpdate'); tutupModal('modalList'); segarkan(); document.getElementById('uBuktiFile').value=''; 
+      } else { alert(res.message); } 
+    }
+
+    function hapusMemoUI(row) {
+      Swal.fire({ title: 'Hapus Memo?', text: "Teks pengumuman memo ini akan dihapus permanen.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus' })
+      .then(async (r) => { if (r.isConfirmed) { await apiRequest('hapusMemoServer', { row: row, adminEmail: curUser.email }); segarkan(); } });
+    }
+
+    function hapusTugasUI(row) {
+      Swal.fire({ title: 'Hapus Tugas?', text: "Baris data tugas ini akan dihapus dari sheet utama.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus' })
+      .then(async (r) => { if (r.isConfirmed) { await apiRequest('hapusTugasServer', { row: row, adminEmail: curUser.email }); tutupModal('modalList'); segarkan(); } });
+    }
+
+    function selesaikanLineUI(row) { 
+      Swal.fire({ title: 'Selesaikan Lini?', text: "Lini produksi ini akan dinonaktifkan.", icon: 'question', showCancelButton: true, confirmButtonText: 'Ya, Selesai' })
+      .then(async (result) => { if (result.isConfirmed) { await apiRequest('selesaikanLine', { row: row, userEmail: curUser.email }); segarkan(); } });
+    }
+
+    async function submitLine() { 
+      setL('btnSLine', true); 
+      await apiRequest('tambahLineProduksi', { line: document.getElementById('lNama').value, jenis: document.getElementById('lJenis').value, namaProduk: document.getElementById('lNamaProduk').value, qty: document.getElementById('lQty').value, deadline: document.getElementById('lDeadline').value, userEmail: curUser.email });
+      setL('btnSLine', false, 'Aktifkan Line'); tutupModal('modalTambahLine'); segarkan(); 
+    }
+
+    async function submitMemo() { 
+      setL('btnSMemo', true); 
+      await apiRequest('tambahMemo', { judul: document.getElementById('mJudul').value, teks: document.getElementById('mTeks').value, adminEmail: curUser.email });
+      setL('btnSMemo', false, 'Broadcast Memo'); tutupModal('modalTambahMemo'); segarkan(); 
+    }
+
+    async function submitBaru() { 
+      setL('btnSBaru', true); 
+      var d = { nama: document.getElementById('tNama').value, pekerjaan: document.getElementById('tKerja').value, detail: document.getElementById('tDetail').value, target: document.getElementById('tTgl').value }; 
+      await apiRequest('simpanDataBaru', { data: d, userEmail: curUser.email });
+      setL('btnSBaru', false, 'Simpan Data'); tutupModal('modalTambah'); segarkan(); 
+    }
+
     function bukaModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
     function tutupModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
-    function aksiTambahTugas() { curUser.logged ? bukaModal('modalTambah') : (Swal.fire('Akses Dibatasi', 'Silakan masuk menggunakan akun staff terlebih dahulu.', 'info'), bukaModal('modalLogin')); }
-    function tutupDropdownUser(e) { var d = document.getElementById('dropdownMenu'); if(d) d.classList.add('hidden'); }
+    function aksiTambahTugas() { curUser.logged ? bukaModal('modalTambah') : (Swal.fire('Info', 'Silakan Login Staff dahulu.', 'info'), bukaModal('modalLogin')); }
+    function setL(id, l, t) { var b = document.getElementById(id); b.disabled = l; b.innerHTML = l ? '<span class="spinner"></span>' : t; }
   </script>
 </body>
 </html>
