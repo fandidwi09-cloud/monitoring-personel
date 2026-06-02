@@ -181,15 +181,15 @@
 
       <div class="saas-card p-6 flex flex-col justify-center items-center h-full lg:col-span-1">
         <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-full text-left mb-4">Statistik Rasio Status</h3>
-        <div class="w-full h-32 md:h-36 relative flex justify-center">
-          <canvas id="statChart" class="max-w-[160px] max-h-[140px]"></canvas>
+        <div style="position: relative; height: 160px; width: 100%;">
+          <canvas id="statChart"></canvas>
         </div>
       </div>
 
       <div class="saas-card p-6 flex flex-col justify-center items-center h-full lg:col-span-1">
         <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-full text-left mb-4">Beban Tugas Tim (Top 5)</h3>
-        <div class="w-full h-32 md:h-36 relative flex justify-center">
-          <canvas id="barChart" class="w-full h-full"></canvas>
+        <div style="position: relative; height: 160px; width: 100%;">
+          <canvas id="barChart"></canvas>
         </div>
       </div>
     </div>
@@ -255,7 +255,7 @@
         </div>
         <div class="p-4 bg-white border-t border-slate-100 flex gap-2">
             <input type="text" id="aiInput" placeholder="Ketik pesan di sini..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition" onkeypress="if(event.key === 'Enter') kirimPesanAI()">
-            <button onclick="kirimPesanAI()" class="bg-indigo-600 hover:bg-indigo-700 text-white w-12 h-12 rounded-xl flex items-center justify-center transition shadow-lg shadow-indigo-500/30"><i class="fas fa-paper-plane"></i></button>
+            <button id="btnKirimChatAI" onclick="kirimPesanAI()" class="bg-indigo-600 hover:bg-indigo-700 text-white w-12 h-12 rounded-xl flex items-center justify-center transition shadow-lg shadow-indigo-500/30"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
   </div>
@@ -266,13 +266,19 @@
         <h3 class="font-extrabold text-slate-800 text-base">Rincian Pekerjaan</h3>
         <button onclick="tutupModal('modalDetailInfo')" class="w-8 h-8 rounded-full bg-slate-200/50 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
       </div>
-      <div class="p-6 space-y-5">
+      <div class="p-6 space-y-5 h-full max-h-[70vh] overflow-y-auto">
         <div>
           <span id="dtStatusBadge" class="text-[10px] font-extrabold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 mb-3 inline-block uppercase tracking-wider"></span>
           <h2 id="dtKerja" class="text-xl font-black text-slate-900 leading-tight"></h2>
           <p id="dtNama" class="text-xs text-brand-600 font-bold mt-1.5 flex items-center gap-1.5"><i class="fas fa-user-circle"></i> <span></span></p>
         </div>
         <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 text-sm text-slate-700 leading-relaxed whitespace-pre-line" id="dtDetailKerja"></div>
+        
+        <div id="dtBoxFoto" class="hidden mt-3 text-center">
+            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5 w-full text-left">Foto Pekerjaan</p>
+            <img id="dtFotoImg" class="w-full max-h-[220px] object-cover rounded-xl border border-slate-200 shadow-sm" src="">
+        </div>
+
         <div class="flex gap-4 text-xs bg-white border border-slate-200 p-4 rounded-2xl shadow-sm">
           <div class="flex-1"><p class="text-slate-400 mb-1 font-extrabold uppercase text-[10px] tracking-widest">Target Selesai</p><p id="dtTarget" class="font-bold text-slate-800 text-sm"></p></div>
         </div>
@@ -285,7 +291,7 @@
         </div>
         <div id="dtBoxLampiran" class="hidden">
           <a id="dtLinkLampiran" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-sm px-4 py-4 rounded-2xl border border-slate-200 transition shadow-sm hover:shadow-md">
-            <i class="fas fa-cloud-download-alt text-brand-500 text-lg"></i> Buka Lampiran Dokumen
+            <i class="fas fa-cloud-download-alt text-brand-500 text-lg"></i> Buka Tautan Bukti Pekerjaan
           </a>
         </div>
       </div>
@@ -457,7 +463,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbx_7yDsJsRkke62pM06npcxuTc2I26U7CKHDwiUUefNwWfNRXM67zW8rwXeRAODDmLa4g/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxmkkP4Ja4bK-TFYnrAiuhhjVPR_p3VHtfIoqS2h1PnmJ0g-g-2oTiT0u8U1IqfJ2xHnw/exec";
 
     var dataMaster = [];
     var curUser = { logged: false, nama: "", email: "", isAdmin: false, avatar: "" };
@@ -474,11 +480,52 @@
         if(!btn) return;
         if(isLoading) {
             btn.disabled = true;
-            btn.innerHTML = `<span class="spinner"></span> Memproses...`;
+            btn.innerHTML = `<span class="spinner"></span>`;
         } else {
             btn.disabled = false;
             btn.innerHTML = text;
         }
+    }
+
+    // BUG FIX 2: Fungsi Interaktif Chat AI Ke Backend Gemini
+    async function kirimPesanAI() {
+        var input = document.getElementById('aiInput');
+        var pesan = input.value.trim();
+        if(!pesan) return;
+        var chatBox = document.getElementById('aiChatBox');
+        
+        chatBox.innerHTML += `
+            <div class="flex gap-3 max-w-[85%] ml-auto justify-end mt-2">
+                <div class="bg-indigo-600 text-white p-3.5 rounded-2xl rounded-tr-none shadow-sm text-[13px]">${pesan}</div>
+                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 border border-slate-300"><i class="fas fa-user text-xs"></i></div>
+            </div>`;
+        input.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        var loadingId = 'load-' + Date.now();
+        chatBox.innerHTML += `
+        <div id="${loadingId}" class="flex gap-3 max-w-[85%] mt-2">
+            <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-200"><i class="fas fa-robot text-xs"></i></div>
+            <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 flex items-center"><span class="spinner !w-3 !h-3 !border-[2.5px] border-indigo-500 border-t-transparent"></span></div>
+        </div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        setL('btnKirimChatAI', true);
+
+        // Memanggil endpoint tanyaGemini di Code.gs
+        const res = await callAPI("tanyaGemini", { pesan: pesan });
+        
+        document.getElementById(loadingId).remove();
+        setL('btnKirimChatAI', false, '<i class="fas fa-paper-plane"></i>');
+
+        var balasanAI = res.success ? res.balasan : "Maaf, sistem AI sedang offline.";
+        chatBox.innerHTML += `
+        <div class="flex gap-3 max-w-[85%] mt-2">
+            <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-200"><i class="fas fa-robot text-xs"></i></div>
+            <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 text-[13px] text-slate-700 leading-relaxed">
+                ${balasanAI.replace(/\n/g, '<br>')}
+            </div>
+        </div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function tampilkanPopupMemoDinamis(memoTerbaru) {
@@ -498,7 +545,6 @@
         mulaiJam(); updateAuthUI(); segarkan(); 
         setInterval(() => { if (!isFetching) segarkan(); }, 5000); 
 
-        // BUG FIX: Munculkan popup SOP default saat web dibuka/direload
         setTimeout(() => {
             Swal.fire({
                 title: 'Pengumuman Sistem',
@@ -511,42 +557,6 @@
         }, 500);
     };
 
-    // FUNGSI CHAT AI
-    function kirimPesanAI() {
-        var input = document.getElementById('aiInput');
-        var pesan = input.value.trim();
-        if(!pesan) return;
-        var chatBox = document.getElementById('aiChatBox');
-        
-        chatBox.innerHTML += `
-            <div class="flex gap-3 max-w-[85%] ml-auto justify-end">
-                <div class="bg-indigo-600 text-white p-3.5 rounded-2xl rounded-tr-none shadow-sm text-[13px]">${pesan}</div>
-                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 border border-slate-300"><i class="fas fa-user text-xs"></i></div>
-            </div>`;
-        input.value = '';
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        setTimeout(() => {
-            chatBox.innerHTML += `
-            <div class="flex gap-3 max-w-[85%]">
-                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-200"><i class="fas fa-robot text-xs"></i></div>
-                <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 flex items-center"><span class="spinner !w-3 !h-3 !border-[2.5px] border-indigo-500 border-t-transparent"></span></div>
-            </div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            setTimeout(() => {
-                chatBox.lastElementChild.remove();
-                chatBox.innerHTML += `
-                <div class="flex gap-3 max-w-[85%]">
-                    <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-200"><i class="fas fa-robot text-xs"></i></div>
-                    <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 text-[13px] text-slate-700 leading-relaxed">
-                        Mohon maaf, integrasi AI *cloud* sedang dalam tahap pemeliharaan. Silakan hubungi tim Admin untuk mengakses fitur operasional ProMonev penuh.
-                    </div>
-                </div>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 1200);
-        }, 400);
-    }
 
     function lupaPin() {
         Swal.fire({
@@ -559,7 +569,6 @@
         });
     }
 
-    // EVENT LISTENER PREVIEW FOTO
     document.getElementById('fotoBaru').addEventListener('change', function(e) {
         var f = e.target.files[0];
         if (f) {
@@ -575,7 +584,7 @@
     });
 
     async function callAPI(action, payload = {}) {
-      const showLoader = action !== "ambilDataDashboard"; 
+      const showLoader = (action !== "ambilDataDashboard" && action !== "tanyaGemini"); 
       if (showLoader) { document.getElementById('globalLoader').classList.remove('hidden'); document.getElementById('globalLoader').classList.add('flex'); }
       try {
         const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: action, ...payload }), redirect: 'follow' });
@@ -655,7 +664,6 @@
         document.getElementById('sbUserRole').innerText = roleName;
         document.getElementById('navUmumMenu').style.display = curUser.isAdmin ? 'block' : 'none';
         
-        // Atur kursor dan fitur hover gambar untuk user login
         profilWrapper.classList.add('cursor-pointer', 'group');
         cameraOverlay.classList.remove('hidden');
         cameraOverlay.classList.add('flex', 'opacity-0', 'group-hover:opacity-100');
@@ -699,7 +707,6 @@
         document.getElementById('sbUserRole').innerText = "Pengunjung imedin.id";
         document.getElementById('navUmumMenu').style.display = 'none';
 
-        // Cegah klik ganti foto profil saat belum login
         profilWrapper.classList.remove('cursor-pointer', 'group');
         cameraOverlay.classList.remove('flex', 'opacity-0', 'group-hover:opacity-100');
         cameraOverlay.classList.add('hidden');
@@ -719,9 +726,15 @@
     async function prosesLogin() {
       var e = document.getElementById('loginEmail').value, p = document.getElementById('loginPin').value;
       if (!e || !p) { document.getElementById('loginErrorMsg').innerText = "Mohon lengkapi formulir."; return; }
-      setL('btnLoginSubmit', true);
+      
+      // Tombol proses state (Fix)
+      var btn = document.getElementById('btnLoginSubmit');
+      btn.innerHTML = `<span class="spinner"></span> Memproses...`; btn.disabled = true;
+
       const res = await callAPI("verifikasiLogin", { email: e, pin: p });
-      setL('btnLoginSubmit', false, 'Otorisasi Masuk');
+      
+      btn.innerHTML = `Otorisasi Masuk`; btn.disabled = false;
+      
       if (res.success) { 
           curUser = res; curUser.logged = true; 
           sessionStorage.setItem('userSession', JSON.stringify(curUser));
@@ -734,7 +747,9 @@
     async function submitGantiPin() {
       var pL = document.getElementById('pinLama').value, pB = document.getElementById('pinBaru').value;
       if(!pL || pB.length < 4) return Swal.fire('Peringatan', 'PIN Baru minimal 4 karakter.', 'warning');
-      setL('btnSgantiPin', true); const res = await callAPI("updatePinUser", { email: curUser.email, pinLama: pL, pinBaru: pB }); setL('btnSgantiPin', false, 'Simpan Keamanan');
+      setL('btnSgantiPin', true, '<span class="spinner"></span>'); 
+      const res = await callAPI("updatePinUser", { email: curUser.email, pinLama: pL, pinBaru: pB }); 
+      setL('btnSgantiPin', false, 'Simpan Keamanan');
       if(res.success) { Swal.fire('Tersimpan', res.message, 'success'); tutupModal('modalGantiPin'); document.getElementById('pinLama').value=''; document.getElementById('pinBaru').value=''; } else { Swal.fire('Gagal', res.message, 'error'); }
     }
 
@@ -743,7 +758,7 @@
         if (!f) return Swal.fire({text:'Pilih foto terlebih dahulu!', icon:'warning', customClass:{popup:'rounded-3xl'}});
         if (f.size > 2 * 1024 * 1024) return Swal.fire({text:'Maksimal ukuran foto 2MB!', icon:'warning', customClass:{popup:'rounded-3xl'}});
 
-        setL('btnSgantiFoto', true);
+        setL('btnSgantiFoto', true, '<span class="spinner"></span>');
         var reader = new FileReader();
         reader.onload = async function(e) {
             var b64 = e.target.result;
@@ -770,6 +785,8 @@
     function renderCharts(s, personnelData) {
       const ctx = document.getElementById('statChart'); if(!ctx) return;
       if (statChartInstance) statChartInstance.destroy();
+      
+      // BUG FIX 1: Chart Instance stabil
       statChartInstance = new Chart(ctx.getContext('2d'), {
         type: 'doughnut',
         data: { labels: ['Selesai', 'Berjalan', 'Approval', 'Revisi'], datasets: [{ data: [s.selesai, s.berjalan, s.approval, s.reject], backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#F43F5E'], borderWidth: 0, hoverOffset: 4 }] },
@@ -935,12 +952,34 @@
 
     async function submitBaru() { setL('btnSBaru', true); const res = await callAPI("simpanDataBaru", { data: { nama: document.getElementById('tNama').value, pekerjaan: document.getElementById('tKerja').value, detail: document.getElementById('tDetail').value, target: document.getElementById('tTgl').value }, userEmail: curUser.email }); setL('btnSBaru', false, 'Tugaskan Sekarang'); if(res.success) { tutupModal('modalTambah'); segarkan(); Swal.fire({title: 'Sukses', icon: 'success', timer: 1500, showConfirmButton: false, customClass:{popup:'rounded-3xl'}}); } }
     
+    // BUG FIX 3: Render Gambar Bukti Langsung di Modal
     function lihatDetailTugas(row) {
       var p = (dataMaster.mentah || []).find(x => x.row === row); if(!p) return;
-      document.getElementById('dtNama').querySelector('span').innerText = p.nama; document.getElementById('dtKerja').innerText = p.pekerjaan; document.getElementById('dtDetailKerja').innerText = p.detailPekerjaan; document.getElementById('dtTarget').innerText = p.revisiTarget ? p.targetSelesai + " (Revisi: " + p.revisiTarget + ")" : p.targetSelesai; document.getElementById('dtStatusBadge').innerText = p.status;
+      document.getElementById('dtNama').querySelector('span').innerText = p.nama; 
+      document.getElementById('dtKerja').innerText = p.pekerjaan; 
+      document.getElementById('dtDetailKerja').innerText = p.detailPekerjaan; 
+      document.getElementById('dtTarget').innerText = p.revisiTarget ? p.targetSelesai + " (Revisi: " + p.revisiTarget + ")" : p.targetSelesai; 
+      document.getElementById('dtStatusBadge').innerText = p.status;
+      
       if(p.kendala === "Ada") { document.getElementById('dtBoxKendala').classList.remove('hidden'); document.getElementById('dtKendalaInfo').innerText = p.detailKendala || "-"; if(p.solusi) { document.getElementById('dtBoxSolusi').classList.remove('hidden'); document.getElementById('dtSolusiInfo').innerText = p.solusi; } else { document.getElementById('dtBoxSolusi').classList.add('hidden'); } } else { document.getElementById('dtBoxKendala').classList.add('hidden'); }
-      if(p.bukti && p.bukti.trim() !== "") { document.getElementById('dtBoxLampiran').classList.remove('hidden'); document.getElementById('dtLinkLampiran').href = p.bukti; } else { document.getElementById('dtBoxLampiran').classList.add('hidden'); }
       if(p.catatanAdmin) { document.getElementById('dtBoxAdmin').classList.remove('hidden'); document.getElementById('dtCatatanAdmin').innerText = p.catatanAdmin; } else { document.getElementById('dtBoxAdmin').classList.add('hidden'); }
+      
+      // Handle penampakan foto bukti (Menggunakan direct link ID dari server)
+      if(p.bukti && p.bukti.trim() !== "") { 
+          document.getElementById('dtBoxLampiran').classList.remove('hidden'); 
+          document.getElementById('dtLinkLampiran').href = p.bukti; 
+          
+          if(p.bukti.includes('uc?export=view') || p.bukti.includes('.jpg') || p.bukti.includes('.png')) {
+              document.getElementById('dtBoxFoto').classList.remove('hidden');
+              document.getElementById('dtFotoImg').src = p.bukti;
+          } else {
+              document.getElementById('dtBoxFoto').classList.add('hidden');
+          }
+      } else { 
+          document.getElementById('dtBoxLampiran').classList.add('hidden'); 
+          document.getElementById('dtBoxFoto').classList.add('hidden');
+      }
+
       bukaModal('modalDetailInfo');
     }
     
@@ -978,7 +1017,8 @@
     function finalSimpanUpdate() {
       var f = document.getElementById('uBuktiFile').files[0], o = document.getElementById('uBuktiLama').value;
       if (f && f.size > 8*1024*1024) return Swal.fire({text:'Batas ukuran file adalah 8MB.', icon:'warning', customClass:{popup:'rounded-3xl'}});
-      setL('btnSUpdate', true); var d = { row: document.getElementById('uRow').value, status: document.getElementById('uStatus').value, kendala: document.getElementById('uKendala').value, detailKendala: document.getElementById('uMasalah').value, solusi: document.getElementById('uSolusi').value, revisiTarget: document.getElementById('uRevisi').value, currentUserEmail: curUser.email, buktiLama: o, buktiBase64: null };
+      setL('btnSUpdate', true, '<span class="spinner"></span>'); 
+      var d = { row: document.getElementById('uRow').value, status: document.getElementById('uStatus').value, kendala: document.getElementById('uKendala').value, detailKendala: document.getElementById('uMasalah').value, solusi: document.getElementById('uSolusi').value, revisiTarget: document.getElementById('uRevisi').value, currentUserEmail: curUser.email, buktiLama: o, buktiBase64: null };
       if (f) { var r = new FileReader(); r.onload = function(e) { d.buktiBase64 = e.target.result; kirimUpdateServer(d); }; r.readAsDataURL(f); } else { kirimUpdateServer(d); }
     }
 
@@ -987,8 +1027,8 @@
     function hapusMemoUI(row) { Swal.fire({ title: 'Hapus Memo?', icon: 'warning', showCancelButton: true, confirmButtonColor:'#ef4444', customClass:{popup:'rounded-3xl', confirmButton:'rounded-xl', cancelButton:'rounded-xl'} }).then(async (r) => { if (r.isConfirmed) { await callAPI("hapusMemoServer", { row: row, adminEmail: curUser.email }); segarkan(); } }); }
     function hapusTugasUI(row) { Swal.fire({ title: 'Hapus Tugas?', text:'Data dihapus dari database.', icon: 'warning', showCancelButton: true, confirmButtonColor:'#ef4444', customClass:{popup:'rounded-3xl', confirmButton:'rounded-xl', cancelButton:'rounded-xl'} }).then(async (r) => { if (r.isConfirmed) { await callAPI("hapusTugasServer", { row: row, adminEmail: curUser.email }); tutupModal('modalList'); segarkan(); } }); }
     function selesaikanLineUI(row) { Swal.fire({ title: 'Tutup Lini Produksi?', icon: 'question', showCancelButton: true, confirmButtonColor:'#10b981', customClass:{popup:'rounded-3xl', confirmButton:'rounded-xl', cancelButton:'rounded-xl'} }).then(async (r) => { if (r.isConfirmed) { await callAPI("selesaikanLine", { row: row, userEmail: curUser.email }); segarkan(); } }); }
-    async function submitLine() { setL('btnSLine', true); const res = await callAPI("tambahLineProduksi", { line: document.getElementById('lNama').value, jenis: document.getElementById('lJenis').value, namaProduk: document.getElementById('lNamaProduk').value, qty: document.getElementById('lQty').value, deadline: document.getElementById('lDeadline').value, userEmail: curUser.email }); setL('btnSLine', false, 'Jalankan Lini'); if(res.success) { tutupModal('modalTambahLine'); segarkan(); } }
-    async function submitMemo() { setL('btnSMemo', true); const res = await callAPI("tambahMemo", { judul: document.getElementById('mJudul').value, teks: document.getElementById('mTeks').value, adminEmail: curUser.email }); setL('btnSMemo', false, 'Publikasikan Ke Tim'); if(res.success) { tutupModal('modalTambahMemo'); segarkan(); document.getElementById('mJudul').value=''; document.getElementById('mTeks').value=''; } }
+    async function submitLine() { setL('btnSLine', true, '<span class="spinner"></span>'); const res = await callAPI("tambahLineProduksi", { line: document.getElementById('lNama').value, jenis: document.getElementById('lJenis').value, namaProduk: document.getElementById('lNamaProduk').value, qty: document.getElementById('lQty').value, deadline: document.getElementById('lDeadline').value, userEmail: curUser.email }); setL('btnSLine', false, 'Jalankan Lini'); if(res.success) { tutupModal('modalTambahLine'); segarkan(); } }
+    async function submitMemo() { setL('btnSMemo', true, '<span class="spinner"></span>'); const res = await callAPI("tambahMemo", { judul: document.getElementById('mJudul').value, teks: document.getElementById('mTeks').value, adminEmail: curUser.email }); setL('btnSMemo', false, 'Publikasikan Ke Tim'); if(res.success) { tutupModal('modalTambahMemo'); segarkan(); document.getElementById('mJudul').value=''; document.getElementById('mTeks').value=''; } }
 
   </script>
 </body>
