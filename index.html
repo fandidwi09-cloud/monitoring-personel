@@ -104,6 +104,11 @@
       </nav>
 
       <div>
+        <h3 class="text-[10px] font-bold uppercase text-indigo-400 tracking-wider mb-2 flex items-center gap-2"><i class="fas fa-bullhorn"></i> Papan Pengumuman</h3>
+        <div id="boxMemo" class="space-y-2 max-h-32 overflow-y-auto pr-1 break-words"></div>
+      </div>
+
+      <div>
         <h3 class="text-[10px] font-bold uppercase text-amber-400 tracking-wider mb-2 flex items-center gap-2"><i class="fas fa-bell"></i> Target Berjalan</h3>
         <div id="boxReminder" class="space-y-2 max-h-40 overflow-y-auto pr-1 break-words"></div>
       </div>
@@ -465,20 +470,19 @@
         }
     }
 
-    function tampilkanPopupMemo() {
+    function tampilkanPopupMemoDinamis(memoTerbaru) {
       Swal.fire({
-        title: 'PENGUMUMAN RUTIN',
-        text: 'Seluruh tim wajib melakukan update progress pekerjaan paling lambat pukul 17.30 WIB setiap harinya. Terima kasih.',
+        title: memoTerbaru.judul,
+        text: memoTerbaru.teks,
         icon: 'info',
         confirmButtonText: 'Saya Mengerti',
-        confirmButtonColor: '#2563eb',
-        customClass: { popup: 'rounded-[2rem]', title: 'font-extrabold', confirmButton: 'rounded-xl px-6 font-bold' }
+        confirmButtonColor: '#4f46e5',
+        customClass: { popup: 'rounded-[2rem]', title: 'font-extrabold text-lg', confirmButton: 'rounded-xl px-6 font-bold text-sm' }
       });
     }
 
     window.onload = function() { 
         mulaiJam(); updateAuthUI(); segarkan(); 
-        tampilkanPopupMemo(); 
         setInterval(() => { if (!isFetching && curUser.logged) segarkan(); }, 5000); 
     };
 
@@ -553,7 +557,6 @@
     function updateAuthUI() {
       var area = document.getElementById('authStatusArea');
       var sbCard = document.getElementById('sidebarProfileCard');
-      var sbPrompt = document.getElementById('sidebarLoginPrompt'); // Will be undefined since removed, handled below
       
       if (curUser.logged) {
         let inisial = curUser.nama.substring(0,2).toUpperCase();
@@ -634,7 +637,6 @@
 
     function submitGantiFoto() {
         setL('btnSgantiFoto', true);
-        // Simulasi update foto profil (Integrasikan dengan backend di kemudian hari)
         setTimeout(() => {
             setL('btnSgantiFoto', false, 'Upload Foto Baru');
             Swal.fire({title: 'Foto Diperbarui!', text: 'Fitur pembaruan foto akan terlihat setelah reload.', icon: 'success', customClass: {popup: 'rounded-3xl'}});
@@ -707,6 +709,31 @@
       if(res.reminders.length===0) boxR.innerHTML = '<p class="text-[11px] text-slate-500 italic bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">Belum ada target mendesak.</p>';
       res.reminders.sort((a,b) => a.diff - b.diff).forEach(r => { boxR.innerHTML += `<div onclick="lihatDetailTugas(${r.row})" class="bg-amber-900/20 border border-amber-500/20 p-3 rounded-xl cursor-pointer hover:bg-amber-900/40 transition flex justify-between items-center"><div class="truncate pr-2 w-3/4"><span class="text-[11px] font-bold text-amber-400 block">${r.nama}</span><span class="text-[10px] text-slate-300 truncate block mt-1">${r.pekerjaan}</span></div><span class="text-[9px] font-bold bg-amber-500/20 text-amber-300 px-2 py-1 rounded-md border border-amber-500/30">${r.statusHari}</span></div>`; });
 
+      // LOGIKA RENDER MEMO BARU
+      var boxM = document.getElementById('boxMemo');
+      if (boxM) {
+          boxM.innerHTML = '';
+          if (!res.memos || res.memos.length === 0) {
+              boxM.innerHTML = '<p class="text-[11px] text-slate-500 italic bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">Belum ada pengumuman baru.</p>';
+          } else {
+              res.memos.forEach(m => {
+                  boxM.innerHTML += `
+                  <div class="bg-indigo-900/20 border border-indigo-500/20 p-3 rounded-xl group relative">
+                    ${(curUser.logged && curUser.isAdmin) ? `<button onclick="hapusMemoUI(${m.row})" class="absolute top-2 right-2 text-indigo-400 hover:text-rose-400 hidden group-hover:block transition"><i class="fas fa-trash text-[10px]"></i></button>` : ''}
+                    <span class="text-[11px] font-bold text-indigo-300 block pr-4">${m.judul}</span>
+                    <span class="text-[10px] text-slate-300 block mt-1 leading-relaxed">${m.teks}</span>
+                  </div>`;
+              });
+              
+              // Tampilkan popup jika ada memo terbaru dan belum dilihat di sesi ini
+              let memoBaru = res.memos[0]; 
+              if (!sessionStorage.getItem('memoDilihat_' + memoBaru.row)) {
+                  tampilkanPopupMemoDinamis(memoBaru);
+                  sessionStorage.setItem('memoDilihat_' + memoBaru.row, 'true');
+              }
+          }
+      }
+
       document.getElementById('txtSelesai').innerText = res.stats.selesai; document.getElementById('txtBerjalan').innerText = res.stats.berjalan; document.getElementById('txtApproval').innerText = res.stats.approval; document.getElementById('txtReject').innerText = res.stats.reject;
       
       renderCharts(res.stats, res.personel); 
@@ -761,8 +788,7 @@
       if (!curUser.logged) return bukaModal('modalLogin');
       let boxNama = document.getElementById('boxInputNama');
       if (curUser.isAdmin) {
-        // NAMA KARYAWAN SINGKAT SESUAI PERMINTAAN (Urut Abjad)
-        boxNama.innerHTML = `<label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Pilih Karyawan</label><select id="tNama" class="w-full border border-slate-200 p-3.5 rounded-xl text-sm font-semibold bg-white cursor-pointer" required><option value="" disabled selected>Pilih Anggota Tim...</option><option value="Ajang">Ajang</option><option value="Andika">Andika</option><option value="Fandi">Fandi</option><option value="Gadil">Gadil</option><option value="Hamzah">Hamzah</option><option value="Ika">Ika</option><option value="Irfan">Irfan</option><option value="Julian">Julian</option><option value="Kiki">Kiki</option><option value="Nanda">Nanda</option><option value="Sandi">Sandi</option><option value="Subur">Subur</option><option value="Syauqi">Syauqi</option></select>`;
+        boxNama.innerHTML = `<label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Pilih Karyawan</label><select id="tNama" class="w-full border border-slate-200 p-3.5 rounded-xl text-sm font-semibold bg-white cursor-pointer" required><option value="" disabled selected>Pilih Anggota Tim...</option><option value="Ajang">Ajang</option><option value="Andika">Andika</option><option value="Fandi">Fandi</option><option value="Fadil">Fadil</option><option value="Hamzah">Hamzah</option><option value="Ika">Ika</option><option value="Irfan">Irfan</option><option value="Julian">Julian</option><option value="Kiki">Kiki</option><option value="Nanda">Nanda</option><option value="Sandi">Sandi</option><option value="Subur">Subur</option><option value="Syauqi">Syauqi</option></select>`;
       } else {
         boxNama.innerHTML = `<label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Ditugaskan Kepada</label><div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl p-3.5"><i class="fas fa-lock text-slate-400 mr-2"></i><input type="text" id="tNama" value="${curUser.nama}" class="w-full bg-transparent text-sm font-bold text-slate-700 outline-none" readonly></div><p class="text-[9px] text-slate-400 mt-1.5 font-medium">*Sistem mengunci inputan atas nama Anda sendiri.</p>`;
       }
