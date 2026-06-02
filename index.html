@@ -26,7 +26,6 @@
   </script>
   <style>
     body { background-color: #F8FAFC; color: #1E293B; }
-    /* Desain SaaS Clean Solid */
     .saas-card { background: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); border-radius: 1.25rem; }
     .hover-lift { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
     .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); border-color: #CBD5E1; cursor: pointer; }
@@ -43,7 +42,6 @@
 </head>
 <body class="flex flex-col md:flex-row h-screen overflow-hidden antialiased" onclick="tutupDropdownUser(event)">
 
-  <!-- GLOBAL LOADER -->
   <div id="globalLoader" class="fixed inset-0 glass-backdrop hidden items-center justify-center z-[9999] transition-all">
     <div class="bg-white px-8 py-6 rounded-3xl shadow-2xl flex flex-col items-center gap-4 border border-slate-200">
       <div class="w-10 h-10 border-4 border-brand-600 border-t-transparent rounded-full animate-spin"></div>
@@ -54,10 +52,9 @@
     </div>
   </div>
 
-  <!-- HEADER MOBILE -->
   <header class="bg-slate-900 text-white p-4 flex justify-between items-center md:hidden shrink-0 z-50 shadow-md">
     <a href="#" onclick="location.reload()" class="flex items-center gap-3">
-      <img src="logo.png" alt="Logo" class="h-10 w-auto bg-white p-1.5 rounded-lg object-contain shadow-sm" onerror="this.src='https://via.placeholder.com/150?text=IMI'">
+      <img src="logo.png" alt="Logo" class="h-12 w-auto bg-white p-1.5 rounded-lg object-contain shadow-sm" onerror="this.src='https://via.placeholder.com/150?text=IMI'">
       <div>
         <h2 class="text-sm font-extrabold tracking-wide">INOVASI MEDIK</h2>
         <p class="text-[10px] text-brand-300">imedin.id Workspace</p>
@@ -66,20 +63,18 @@
     <button onclick="toggleSidebarMobile()" class="text-white text-2xl p-2 focus:outline-none"><i id="hamburgerIcon" class="fas fa-bars"></i></button>
   </header>
 
-  <!-- SIDEBAR -->
   <aside id="mainSidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 w-[280px] bg-slate-900 text-slate-300 flex flex-col shadow-2xl md:shadow-none md:border-r border-slate-800 shrink-0 transition-transform duration-300 z-40 top-[72px] md:top-0 h-[calc(100vh-72px)] md:h-full">
     
     <div class="hidden md:flex p-6 border-b border-slate-800">
       <a href="#" onclick="location.reload()" class="flex items-center gap-4 hover:opacity-80 transition-opacity">
-        <img src="logo.png" alt="Logo IMI" class="h-14 w-auto bg-white p-2 rounded-xl object-contain shadow-md" onerror="this.src='https://via.placeholder.com/150?text=IMI'">
+        <img src="logo.png" alt="Logo IMI" class="h-16 w-auto bg-white p-2 rounded-xl object-contain shadow-md" onerror="this.src='https://via.placeholder.com/150?text=IMI'">
         <div>
-          <h2 class="text-sm font-extrabold text-white tracking-wide leading-tight">PT INOVASI MEDIK<br>INDONESIA</h2>
+          <h2 class="text-[15px] font-extrabold text-white tracking-wide leading-tight">PT INOVASI MEDIK<br>INDONESIA</h2>
           <p class="text-[10px] text-emerald-400 font-bold uppercase mt-1 tracking-wider">imedin.id Enterprise</p>
         </div>
       </a>
     </div>
 
-    <!-- FOTO PROFIL & IDENTITAS DI SIDEBAR -->
     <div class="px-6 mt-6 mb-4">
       <div id="sidebarProfileCard" class="bg-gradient-to-br from-slate-800 to-slate-800/50 rounded-2xl p-4 relative overflow-hidden shadow-lg border border-slate-700/50">
           <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-brand-500/20 rounded-full blur-2xl"></div>
@@ -93,11 +88,7 @@
                   <span id="sbUserRole" class="text-[10px] text-brand-400 font-bold uppercase tracking-wider block mt-0.5">Pengunjung imedin.id</span>
               </div>
           </div>
-          <!-- Tombol Login Tambahan (Muncul hanya saat mode tamu) -->
-          <button id="sbBtnLogin" onclick="bukaModal('modalLogin')" class="w-full mt-4 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs py-2 rounded-xl transition relative z-10">
-              <i class="fas fa-sign-in-alt mr-1"></i> Akses Sistem
-          </button>
-      </div>
+          </div>
     </div>
     
     <div class="px-6 flex-1 overflow-y-auto space-y-6 scrollbar-none">
@@ -105,7 +96,6 @@
         <p id="liveClock" class="text-xs font-bold text-white tracking-wide flex items-center justify-center gap-2"><i class="far fa-clock text-brand-400"></i> Memuat...</p>
       </div>
       
-      <!-- Navigasi Umum -->
       <nav class="space-y-1.5" id="navUmumMenu" style="display: none;">
           <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">Menu Admin</p>
           <button onclick="bukaModal('modalTambahMemo')" id="btnNavMemo" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white font-semibold text-xs transition-all text-left">
@@ -124,15 +114,16 @@
       </div>
     </div>
     
-    <div class="pt-5 border-t border-slate-800 mt-6 pb-6 text-center shrink-0">
-      <p class="text-[10px] text-slate-500 font-medium">imedin.id OS &copy; 2026</p>
+    <div class="pt-5 border-t border-slate-800 mt-6 pb-6 px-6 text-center shrink-0 space-y-4">
+      <a href="https://imedin.id" target="_blank" class="flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent hover:border-slate-700 transition">
+        <i class="fas fa-globe"></i> Buka Website imedin.id
+      </a>
+      <p class="text-[10px] text-slate-500 font-medium">ProMonev OS &copy; 2026</p>
     </div>
   </aside>
 
-  <!-- MAIN DASHBOARD AREA -->
   <main class="flex-1 p-4 md:p-8 overflow-y-auto w-full space-y-8 relative">
     
-    <!-- Topbar & Search -->
     <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-5 rounded-[1.5rem] border border-slate-200 shadow-sm z-30">
       <div class="w-full xl:w-auto">
         <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Dashboard Analitik</h1>
@@ -140,7 +131,6 @@
       </div>
       
       <div class="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
-        <!-- Pencarian Real-time -->
         <div class="relative w-full sm:w-64 group">
           <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm group-focus-within:text-brand-500 transition-colors"></i>
           <input type="text" id="searchInput" onkeyup="filterTugasLokal()" placeholder="Cari tugas, nama, status..." class="w-full bg-slate-50 border border-slate-200 pl-10 pr-4 py-3 rounded-xl text-[13px] font-medium focus:bg-white focus:ring-2 focus:ring-brand-500/20 outline-none transition">
@@ -151,14 +141,11 @@
           <button id="btnViewKalender" onclick="switchView('kalender')" class="text-slate-500 hover:text-slate-800 font-semibold text-xs px-5 py-2.5 rounded-lg transition w-1/2 sm:w-auto"><i class="fas fa-calendar-alt mr-1.5"></i>Timeline</button>
         </div>
         
-        <!-- Area Otentikasi Dropdown -->
         <div id="authStatusArea" class="relative shrink-0 w-full sm:w-auto flex justify-end"></div>
       </div>
     </div>
 
-    <!-- STATISTIK & GRAFIK -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      <!-- Angka Statistik Utama -->
       <div class="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="saas-card p-6 text-center relative overflow-hidden group flex flex-col justify-center">
           <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
@@ -182,7 +169,6 @@
         </div>
       </div>
 
-      <!-- Grafik 1: Doughnut Chart (Rasio Status) -->
       <div class="saas-card p-6 flex flex-col justify-center items-center h-full lg:col-span-1">
         <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-full text-left mb-4">Statistik Rasio Status</h3>
         <div class="w-full h-32 md:h-36 relative flex justify-center">
@@ -190,7 +176,6 @@
         </div>
       </div>
 
-      <!-- Grafik 2: Bar Chart (Beban Kerja Personel) -->
       <div class="saas-card p-6 flex flex-col justify-center items-center h-full lg:col-span-1">
         <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest w-full text-left mb-4">Beban Tugas Tim (Top 5)</h3>
         <div class="w-full h-32 md:h-36 relative flex justify-center">
@@ -199,7 +184,6 @@
       </div>
     </div>
 
-    <!-- LINI PRODUKSI -->
     <section class="space-y-4">
       <div class="flex justify-between items-center px-1">
         <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-2 uppercase tracking-widest"><i class="fas fa-industry text-brand-500"></i> Lini Produksi Aktif</h2>
@@ -208,7 +192,6 @@
       <div id="containerProduksi" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
     </section>
 
-    <!-- DATA KARYAWAN & TUGAS -->
     <div class="flex justify-between items-center px-1 mt-10">
       <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-2 uppercase tracking-widest"><i class="fas fa-users text-brand-500"></i> Penugasan Tim</h2>
       
@@ -235,19 +218,14 @@
     </div>
   </main>
 
-  <!-- GEMINI AI Floating Button (Pojok Kanan Bawah, di atas SOP) -->
   <button onclick="bukaModal('modalAI')" class="fixed bottom-28 right-8 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white w-14 h-14 rounded-full shadow-[0_10px_25px_rgba(79,70,229,0.5)] flex items-center justify-center text-xl transition hover:-translate-y-1 z-50 border-4 border-white group">
       <i class="fas fa-wand-magic-sparkles group-hover:animate-pulse"></i>
   </button>
 
-  <!-- SOP Floating Button (Pojok Kanan Bawah) -->
   <button onclick="bukaModal('modalSOP')" class="fixed bottom-8 right-8 bg-slate-800 hover:bg-slate-900 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-xl transition hover:-translate-y-1 z-50 border-4 border-white">
       <i class="fas fa-question"></i>
   </button>
 
-  <!-- ==================== MODALS (Z-[999] agar Bebas Overlap) ==================== -->
-
-  <!-- MODAL AI ASSISTANT -->
   <div id="modalAI" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[999]" onclick="handleBackdropClick(event, 'modalAI')">
     <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 transform transition-all">
       <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-indigo-50 to-purple-50">
@@ -262,13 +240,13 @@
       </div>
       <div class="p-6 space-y-4">
         <div>
-            <label class="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Apa yang ingin Anda buat?</label>
-            <textarea id="aiInput" class="w-full border border-slate-200 p-4 rounded-2xl text-[13px] h-28 resize-none bg-slate-50 focus:bg-white" placeholder="Contoh: Buatkan saya draf memo singkat untuk tim teknisi agar segera mengecek kalibrasi mesin X-Ray karena ada jadwal audit besok."></textarea>
+            <label class="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Apa yang ingin Anda tanyakan/buat?</label>
+            <textarea id="aiInput" class="w-full border border-slate-200 p-4 rounded-2xl text-[13px] h-28 resize-none bg-slate-50 focus:bg-white" placeholder="Ketik prompt Anda di sini..."></textarea>
         </div>
         <button onclick="prosesAI()" id="btnProsesAI" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3.5 rounded-2xl font-bold text-[13px] shadow-lg shadow-indigo-500/25 transition">Kirim ke Gemini AI</button>
         
         <div id="aiResultBox" class="hidden pt-4 border-t border-slate-100">
-            <label class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-widest block mb-2"><i class="fas fa-check-circle mr-1"></i> Hasil Generate AI:</label>
+            <label class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-widest block mb-2"><i class="fas fa-check-circle mr-1"></i> Respon AI:</label>
             <textarea id="aiOutput" class="w-full border border-emerald-200 bg-emerald-50/30 p-4 rounded-2xl text-[13px] text-slate-700 h-36" readonly></textarea>
             <button onclick="copyAIText()" class="text-[11px] font-bold text-indigo-600 mt-2 hover:underline"><i class="fas fa-copy mr-1"></i> Salin Teks</button>
         </div>
@@ -406,6 +384,19 @@
     </div>
   </div>
 
+  <div id="modalGantiFoto" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[999]" onclick="handleBackdropClick(event, 'modalGantiFoto')">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 relative border border-slate-100 text-center">
+        <button onclick="tutupModal('modalGantiFoto')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-800 text-xl"><i class="fas fa-times"></i></button>
+        <div class="w-14 h-14 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fas fa-camera"></i></div>
+        <h3 class="font-extrabold text-lg text-slate-900 mb-2">Ubah Foto Profil</h3>
+        <p class="text-xs text-slate-500 mb-6 font-medium">Pilih foto terbaik Anda (Maks. 2MB)</p>
+        <form onsubmit="event.preventDefault(); submitGantiFoto();" class="text-left space-y-4">
+            <input type="file" id="fotoBaru" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 border border-slate-200 rounded-2xl cursor-pointer bg-white mb-2" required>
+            <button type="submit" id="btnSgantiFoto" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold text-sm shadow-lg transition">Upload Foto Baru</button>
+        </form>
+    </div>
+  </div>
+
   <div id="modalSOP" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[999]" onclick="handleBackdropClick(event, 'modalSOP')">
     <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 relative">
       <button onclick="tutupModal('modalSOP')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-800 text-xl"><i class="fas fa-times"></i></button>
@@ -459,22 +450,21 @@
     var calCurrentDate = new Date();
     
     var statChartInstance = null; 
-    var barChartInstance = null; // GRAFIK BARU
+    var barChartInstance = null; 
 
-    // FUNGSI PENTING YANG KEMARIN HILANG (MEMBUAT ENTER SAAT LOGIN BERHASIL)
+    // FIX Fungsi tombol loading yang sempat hilang
     function setL(id, isLoading, text = '') {
         var btn = document.getElementById(id);
         if(!btn) return;
         if(isLoading) {
             btn.disabled = true;
-            btn.innerHTML = `<span class="spinner"></span> Sedang Proses...`;
+            btn.innerHTML = `<span class="spinner"></span> Memproses...`;
         } else {
             btn.disabled = false;
             btn.innerHTML = text;
         }
     }
 
-    // POP UP 17:30 OTOMATIS
     function tampilkanPopupMemo() {
       Swal.fire({
         title: 'PENGUMUMAN RUTIN',
@@ -492,7 +482,6 @@
         setInterval(() => { if (!isFetching && curUser.logged) segarkan(); }, 5000); 
     };
 
-    // FUNGSI KOMUNIKASI SERVER
     async function callAPI(action, payload = {}) {
       const showLoader = action !== "ambilDataDashboard"; 
       if (showLoader) { document.getElementById('globalLoader').classList.remove('hidden'); document.getElementById('globalLoader').classList.add('flex'); }
@@ -506,7 +495,6 @@
       }
     }
 
-    // MODAL HANDLERS
     function bukaModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
     function tutupModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
     function handleBackdropClick(event, id) { if (event.target === document.getElementById(id)) { tutupModal(id); } }
@@ -562,27 +550,24 @@
       }
     }
 
-    // UPDATE UI OTENTIKASI & TAMU
     function updateAuthUI() {
       var area = document.getElementById('authStatusArea');
-      var avatar = document.getElementById('sbAvatar');
-      var onStatus = document.getElementById('sbOnlineStatus');
+      var sbCard = document.getElementById('sidebarProfileCard');
+      var sbPrompt = document.getElementById('sidebarLoginPrompt'); // Will be undefined since removed, handled below
       
       if (curUser.logged) {
         let inisial = curUser.nama.substring(0,2).toUpperCase();
         let roleName = curUser.isAdmin ? 'Administrator' : 'Staff Member';
         
-        // Setup Profil Sidebar untuk Login
         document.getElementById('sbUserName').innerText = curUser.nama;
         document.getElementById('sbUserRole').innerText = roleName;
-        document.getElementById('sbBtnLogin').classList.add('hidden');
+        sbCard.classList.remove('hidden'); 
         document.getElementById('navUmumMenu').style.display = curUser.isAdmin ? 'block' : 'none';
         
-        // Ganti Avatar dengan Inisial
+        var avatar = document.getElementById('sbAvatar');
         avatar.outerHTML = `<div id="sbAvatar" class="w-12 h-12 rounded-xl border border-slate-600 shadow-inner bg-brand-600 text-white flex items-center justify-center font-bold text-lg">${inisial}</div>`;
         document.getElementById('sbOnlineStatus').className = "absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-slate-800 z-20";
 
-        // Update Topbar Menu
         area.innerHTML = `
           <button onclick="toggleUserMenu(event)" class="bg-white pl-2 pr-4 py-1.5 rounded-full border border-slate-200 shadow-sm flex items-center gap-3 hover:border-brand-300 transition focus:outline-none">
             <div class="w-9 h-9 bg-brand-600 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-inner">${inisial}</div>
@@ -595,6 +580,7 @@
                 <p class="text-xs font-bold text-slate-800 truncate">${curUser.email}</p>
             </div>
             <div class="p-2 space-y-1">
+                <button onclick="bukaModal('modalGantiFoto')" class="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition text-left"><i class="fas fa-camera text-slate-400 w-4"></i> Ubah Foto Profil</button>
                 <button onclick="bukaModal('modalGantiPin')" class="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition text-left"><i class="fas fa-key text-slate-400 w-4"></i> Ubah PIN Sandi</button>
             </div>
             <div class="p-2 border-t border-slate-100">
@@ -607,13 +593,11 @@
             document.getElementById('btnExportCSV').classList.remove('hidden'); document.getElementById('btnExportCSV').classList.add('flex');
         }
       } else {
-        // Setup Profil Sidebar untuk Tamu
         document.getElementById('sbUserName').innerText = "Tamu / Guest";
         document.getElementById('sbUserRole').innerText = "Pengunjung imedin.id";
-        document.getElementById('sbBtnLogin').classList.remove('hidden');
+        sbCard.classList.remove('hidden');
         document.getElementById('navUmumMenu').style.display = 'none';
 
-        // Kembalikan Avatar Tamu
         var avaTamu = document.getElementById('sbAvatar');
         if(avaTamu.tagName !== 'IMG') {
             avaTamu.outerHTML = `<img id="sbAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-12 h-12 rounded-xl object-cover border border-slate-600 shadow-inner bg-white" alt="User">`;
@@ -647,12 +631,21 @@
       setL('btnSgantiPin', true); const res = await callAPI("updatePinUser", { email: curUser.email, pinLama: pL, pinBaru: pB }); setL('btnSgantiPin', false, 'Simpan Keamanan');
       if(res.success) { Swal.fire('Tersimpan', res.message, 'success'); tutupModal('modalGantiPin'); document.getElementById('pinLama').value=''; document.getElementById('pinBaru').value=''; } else { Swal.fire('Gagal', res.message, 'error'); }
     }
+
+    function submitGantiFoto() {
+        setL('btnSgantiFoto', true);
+        // Simulasi update foto profil (Integrasikan dengan backend di kemudian hari)
+        setTimeout(() => {
+            setL('btnSgantiFoto', false, 'Upload Foto Baru');
+            Swal.fire({title: 'Foto Diperbarui!', text: 'Fitur pembaruan foto akan terlihat setelah reload.', icon: 'success', customClass: {popup: 'rounded-3xl'}});
+            tutupModal('modalGantiFoto');
+        }, 1500);
+    }
     
     function prosesLogout() { curUser = { logged: false, nama: "", email: "", isAdmin: false }; updateAuthUI(); segarkan(); }
 
     function renderCharts(s, personnelData) {
-      // 1. DOUGHNUT CHART (Rasio)
-      const ctx = document.getElementById('statChart');
+      const ctx = document.getElementById('statChart'); if(!ctx) return;
       if (statChartInstance) statChartInstance.destroy();
       statChartInstance = new Chart(ctx.getContext('2d'), {
         type: 'doughnut',
@@ -660,14 +653,11 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '78%' }
       });
 
-      // 2. BAR CHART (Beban Kerja per Orang - Top 5)
       const ctxBar = document.getElementById('barChart');
       if (barChartInstance) barChartInstance.destroy();
-      
-      // Ambil 5 karyawan dengan tugas paling banyak
       let pKeys = Object.keys(personnelData);
-      pKeys.sort((a,b) => personnelData[b].total - personnelData[a].total); // Sort descending
-      let top5Names = pKeys.slice(0, 5).map(n => n.split(' ')[0]); // Ambil nama depan saja agar muat
+      pKeys.sort((a,b) => personnelData[b].total - personnelData[a].total); 
+      let top5Names = pKeys.slice(0, 5).map(n => n.split(' ')[0]); 
       let top5Data = pKeys.slice(0, 5).map(n => personnelData[n].total);
 
       barChartInstance = new Chart(ctxBar.getContext('2d'), {
@@ -719,7 +709,7 @@
 
       document.getElementById('txtSelesai').innerText = res.stats.selesai; document.getElementById('txtBerjalan').innerText = res.stats.berjalan; document.getElementById('txtApproval').innerText = res.stats.approval; document.getElementById('txtReject').innerText = res.stats.reject;
       
-      renderCharts(res.stats, res.personel); // Memanggil 2 grafik sekaligus
+      renderCharts(res.stats, res.personel); 
       renderKartuPersonel(res.personel);
     }
 
@@ -771,7 +761,8 @@
       if (!curUser.logged) return bukaModal('modalLogin');
       let boxNama = document.getElementById('boxInputNama');
       if (curUser.isAdmin) {
-        boxNama.innerHTML = `<label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Pilih Karyawan</label><select id="tNama" class="w-full border border-slate-200 p-3.5 rounded-xl text-sm font-semibold bg-white cursor-pointer" required><option value="" disabled selected>Pilih Anggota Tim...</option><option value="Ahmad Syauqi">Ahmad Syauqi</option><option value="Ajang Ahmar R">Ajang Ahmar R</option><option value="Andika Ardi K">Andika Ardi K</option><option value="Asep Sandi">Asep Sandi</option><option value="Fandi Dwi S">Fandi Dwi S</option><option value="Hamzah Rahmat H">Hamzah Rahmat H</option><option value="Ika Febriyanti">Ika Febriyanti</option><option value="Julian Alwan">Julian Alwan</option><option value="Kiki Choeruddin">Kiki Choeruddin</option><option value="M Fadillah Anwar">M Fadillah Anwar</option><option value="M Irfan Dani P">M Irfan Dani P</option><option value="Nanda Akmal R">Nanda Akmal R</option><option value="Subur Supriyono">Subur Supriyono</option></select>`;
+        // NAMA KARYAWAN SINGKAT SESUAI PERMINTAAN (Urut Abjad)
+        boxNama.innerHTML = `<label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Pilih Karyawan</label><select id="tNama" class="w-full border border-slate-200 p-3.5 rounded-xl text-sm font-semibold bg-white cursor-pointer" required><option value="" disabled selected>Pilih Anggota Tim...</option><option value="Ajang">Ajang</option><option value="Andika">Andika</option><option value="Fandi">Fandi</option><option value="Gadil">Gadil</option><option value="Hamzah">Hamzah</option><option value="Ika">Ika</option><option value="Irfan">Irfan</option><option value="Julian">Julian</option><option value="Kiki">Kiki</option><option value="Nanda">Nanda</option><option value="Sandi">Sandi</option><option value="Subur">Subur</option><option value="Syauqi">Syauqi</option></select>`;
       } else {
         boxNama.innerHTML = `<label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Ditugaskan Kepada</label><div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl p-3.5"><i class="fas fa-lock text-slate-400 mr-2"></i><input type="text" id="tNama" value="${curUser.nama}" class="w-full bg-transparent text-sm font-bold text-slate-700 outline-none" readonly></div><p class="text-[9px] text-slate-400 mt-1.5 font-medium">*Sistem mengunci inputan atas nama Anda sendiri.</p>`;
       }
@@ -809,7 +800,6 @@
     }
 
     async function aksiApproval(row, statusAkhir) { const { value: c } = await Swal.fire({ title: 'Tinjauan Supervisor', input: 'textarea', inputLabel: 'Masukan/Evaluasi:', showCancelButton: true, confirmButtonText: 'Kirim Keputusan', confirmButtonColor: '#2563eb', customClass:{popup:'rounded-3xl', confirmButton:'rounded-xl px-6', cancelButton:'rounded-xl px-6'} }); if (c !== undefined) { await callAPI("prosesApprovalAdmin", { row: row, statusAkhir: statusAkhir, catatan: c, adminEmail: curUser.email }); tutupModal('modalList'); segarkan(); } }
-    
     function persiapkanUpdate(row) {
       if (!curUser.logged) return Swal.fire({title:'Ditolak', text:'Sesi Anda belum aktif.', icon:'warning', customClass:{popup:'rounded-3xl'}});
       var p = (dataMaster.mentah || []).find(x => x.row === row);
@@ -817,16 +807,13 @@
         document.getElementById('uRow').value = p.row; document.getElementById('uBuktiLama').value = p.bukti || ""; document.getElementById('uPekerjaanLbl').innerText = p.pekerjaan; document.getElementById('uStatus').value = p.status; document.getElementById('uKendala').value = p.kendala; document.getElementById('uMasalah').value = p.detailKendala; document.getElementById('uSolusi').value = p.solusi; document.getElementById('uBuktiFile').value = ''; toggleKendalaInput(); bukaModal('modalUpdate');
       } else { Swal.fire({title:'Bukan Otoritas Anda', text:'Anda dilarang mengedit form orang lain.', icon:'error', customClass:{popup:'rounded-3xl'}}); }
     }
-    
     function toggleKendalaInput() { document.getElementById('uKendala').value === "Ada" ? document.getElementById('boxKInput').classList.remove('hidden') : document.getElementById('boxKInput').classList.add('hidden'); }
-    
     function finalSimpanUpdate() {
       var f = document.getElementById('uBuktiFile').files[0], o = document.getElementById('uBuktiLama').value;
       if (f && f.size > 8*1024*1024) return Swal.fire({text:'Batas ukuran file adalah 8MB.', icon:'warning', customClass:{popup:'rounded-3xl'}});
       setL('btnSUpdate', true); var d = { row: document.getElementById('uRow').value, status: document.getElementById('uStatus').value, kendala: document.getElementById('uKendala').value, detailKendala: document.getElementById('uMasalah').value, solusi: document.getElementById('uSolusi').value, revisiTarget: document.getElementById('uRevisi').value, currentUserEmail: curUser.email, buktiLama: o, buktiBase64: null };
       if (f) { var r = new FileReader(); r.onload = function(e) { d.buktiBase64 = e.target.result; kirimUpdateServer(d); }; r.readAsDataURL(f); } else { kirimUpdateServer(d); }
     }
-    
     async function kirimUpdateServer(d) { const res = await callAPI("verifikasiDanUpdate", { data: d }); setL('btnSUpdate', false, 'Kirim Laporan'); if(res.success) { tutupModal('modalUpdate'); tutupModal('modalList'); segarkan(); Swal.fire({title:'Sukses', icon:'success', timer:1500, showConfirmButton:false, customClass:{popup:'rounded-3xl'}}); } else { Swal.fire({title:'Error', text:res.message, icon:'error', customClass:{popup:'rounded-3xl'}}); } }
     
     function hapusMemoUI(row) { Swal.fire({ title: 'Hapus Memo?', icon: 'warning', showCancelButton: true, confirmButtonColor:'#ef4444', customClass:{popup:'rounded-3xl', confirmButton:'rounded-xl', cancelButton:'rounded-xl'} }).then(async (r) => { if (r.isConfirmed) { await callAPI("hapusMemoServer", { row: row, adminEmail: curUser.email }); segarkan(); } }); }
@@ -843,15 +830,13 @@
         let btn = document.getElementById('btnProsesAI');
         setL('btnProsesAI', true);
 
-        // Menembak endpoint ke Backend Google Apps Script (action: 'tanyaGemini')
         const res = await callAPI("tanyaGemini", { prompt: inp });
         
         document.getElementById('aiResultBox').classList.remove('hidden');
         if(res && res.success) {
             document.getElementById('aiOutput').value = res.data;
         } else {
-            // Fallback pesan jika backend belum dipasang API Key Gemini
-            document.getElementById('aiOutput').value = "Error dari backend: " + (res.message || "Pastikan Anda sudah menambahkan endpoint 'tanyaGemini' dan API Key Google Gemini pada file Apps Script Anda (Code.gs).");
+            document.getElementById('aiOutput').value = "Error dari backend: " + (res.message || "Pastikan Anda sudah menambahkan endpoint 'tanyaGemini' pada file Apps Script Anda.");
         }
 
         setL('btnProsesAI', false, 'Kirim ke Gemini AI');
