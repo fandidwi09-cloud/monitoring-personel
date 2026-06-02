@@ -76,19 +76,24 @@
     </div>
 
     <div class="px-6 mt-6 mb-4">
-      <div id="sidebarProfileCard" class="bg-gradient-to-br from-slate-800 to-slate-800/50 rounded-2xl p-4 relative overflow-hidden shadow-lg border border-slate-700/50">
+      <div id="sidebarProfileCard" class="bg-gradient-to-br from-slate-800 to-slate-800/50 rounded-2xl p-6 relative overflow-hidden shadow-lg border border-slate-700/50 flex flex-col items-center text-center gap-3">
           <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-brand-500/20 rounded-full blur-2xl"></div>
-          <div class="flex items-center gap-3.5 relative z-10">
-              <div class="relative shrink-0">
-                  <img id="sbAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-12 h-12 rounded-xl object-cover border border-slate-600 shadow-inner bg-white" alt="User">
-                  <div id="sbOnlineStatus" class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-slate-500 rounded-full border-2 border-slate-800"></div>
+          
+          <div class="relative shrink-0 group cursor-pointer" onclick="bukaModalGantiFotoAman()" title="Klik untuk ubah foto profil">
+              <div id="avatarContainerWrapper">
+                  <img id="sbAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-24 h-24 rounded-full object-cover border-4 border-brand-500 shadow-lg bg-white transition group-hover:opacity-60" alt="User Avatar">
               </div>
-              <div class="overflow-hidden">
-                  <span id="sbUserName" class="font-bold text-sm text-white tracking-wide block truncate">Tamu / Guest</span>
-                  <span id="sbUserRole" class="text-[10px] text-brand-400 font-bold uppercase tracking-wider block mt-0.5">Pengunjung imedin.id</span>
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                  <i class="fas fa-camera text-white text-2xl drop-shadow-md"></i>
               </div>
+              <div id="sbOnlineStatus" class="absolute bottom-1 right-1 w-5 h-5 bg-slate-500 rounded-full border-4 border-slate-800 z-20"></div>
           </div>
+          
+          <div class="overflow-hidden w-full relative z-10">
+              <span id="sbUserName" class="font-extrabold text-[15px] text-white tracking-wide block truncate">Tamu / Guest</span>
+              <span id="sbUserRole" class="text-[10px] text-brand-400 font-bold uppercase tracking-wider block mt-1">Pengunjung imedin.id</span>
           </div>
+      </div>
     </div>
     
     <div class="px-6 flex-1 overflow-y-auto space-y-6 scrollbar-none">
@@ -96,16 +101,16 @@
         <p id="liveClock" class="text-xs font-bold text-white tracking-wide flex items-center justify-center gap-2"><i class="far fa-clock text-brand-400"></i> Memuat...</p>
       </div>
       
-      <nav class="space-y-1.5" id="navUmumMenu" style="display: none;">
+      <nav class="space-y-1.5 hidden" id="navUmumMenu">
           <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">Menu Admin</p>
-          <button onclick="bukaModal('modalTambahMemo')" id="btnNavMemo" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white font-semibold text-xs transition-all text-left">
-              <i class="fas fa-bullhorn w-4 text-center"></i> Rilis Memo Baru
+          <button onclick="bukaModal('modalTambahMemo')" id="btnNavMemo" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white font-semibold text-xs transition-all text-left border border-slate-700 hover:border-slate-600">
+              <i class="fas fa-bullhorn w-4 text-center text-indigo-400"></i> Rilis Memo Baru
           </button>
       </nav>
 
       <div>
         <h3 class="text-[10px] font-bold uppercase text-indigo-400 tracking-wider mb-2 flex items-center gap-2"><i class="fas fa-bullhorn"></i> Papan Pengumuman</h3>
-        <div id="boxMemo" class="space-y-2 max-h-32 overflow-y-auto pr-1 break-words"></div>
+        <div id="boxMemo" class="space-y-2 max-h-40 overflow-y-auto pr-1 break-words"></div>
       </div>
 
       <div>
@@ -223,41 +228,9 @@
     </div>
   </main>
 
-  <button onclick="bukaModal('modalAI')" class="fixed bottom-28 right-8 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white w-14 h-14 rounded-full shadow-[0_10px_25px_rgba(79,70,229,0.5)] flex items-center justify-center text-xl transition hover:-translate-y-1 z-50 border-4 border-white group">
-      <i class="fas fa-wand-magic-sparkles group-hover:animate-pulse"></i>
-  </button>
-
   <button onclick="bukaModal('modalSOP')" class="fixed bottom-8 right-8 bg-slate-800 hover:bg-slate-900 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-xl transition hover:-translate-y-1 z-50 border-4 border-white">
       <i class="fas fa-question"></i>
   </button>
-
-  <div id="modalAI" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[999]" onclick="handleBackdropClick(event, 'modalAI')">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 transform transition-all">
-      <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-indigo-50 to-purple-50">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md"><i class="fas fa-wand-magic-sparkles"></i></div>
-            <div>
-                <h3 class="font-extrabold text-slate-800 text-base">Asisten Gemini AI</h3>
-                <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-0.5">imedin.id Smart Assistant</p>
-            </div>
-        </div>
-        <button onclick="tutupModal('modalAI')" class="w-8 h-8 rounded-full bg-white/50 hover:bg-white text-slate-400 hover:text-slate-700 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="p-6 space-y-4">
-        <div>
-            <label class="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Apa yang ingin Anda tanyakan/buat?</label>
-            <textarea id="aiInput" class="w-full border border-slate-200 p-4 rounded-2xl text-[13px] h-28 resize-none bg-slate-50 focus:bg-white" placeholder="Ketik prompt Anda di sini..."></textarea>
-        </div>
-        <button onclick="prosesAI()" id="btnProsesAI" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3.5 rounded-2xl font-bold text-[13px] shadow-lg shadow-indigo-500/25 transition">Kirim ke Gemini AI</button>
-        
-        <div id="aiResultBox" class="hidden pt-4 border-t border-slate-100">
-            <label class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-widest block mb-2"><i class="fas fa-check-circle mr-1"></i> Respon AI:</label>
-            <textarea id="aiOutput" class="w-full border border-emerald-200 bg-emerald-50/30 p-4 rounded-2xl text-[13px] text-slate-700 h-36" readonly></textarea>
-            <button onclick="copyAIText()" class="text-[11px] font-bold text-indigo-600 mt-2 hover:underline"><i class="fas fa-copy mr-1"></i> Salin Teks</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div id="modalDetailInfo" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[999]" onclick="handleBackdropClick(event, 'modalDetailInfo')">
     <div class="bg-white rounded-[2rem] shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100">
@@ -420,9 +393,9 @@
       <button onclick="tutupModal('modalTambahLine')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-800 text-xl"><i class="fas fa-times"></i></button>
       <h3 class="font-extrabold text-lg text-slate-900 mb-6">Aktivasi Line Baru</h3>
       <form onsubmit="event.preventDefault(); submitLine();" class="space-y-4">
-        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Pos Area</label><input type="text" id="lNama" placeholder="Misal: Line Perakitan" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
-        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Kategori</label><select id="lJenis" class="w-full border border-slate-200 p-3 rounded-xl text-sm"><option>Elektromedik</option><option>Non-Elektromedik</option></select></div>
-        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Produk Medis</label><input type="text" id="lNamaProduk" placeholder="Nama Produk" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
+        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Pos Area / Line</label><input type="text" id="lNama" placeholder="Misal: Line Perakitan" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
+        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Kategori Produk</label><select id="lJenis" class="w-full border border-slate-200 p-3 rounded-xl text-sm"><option>Elektromedis</option><option>IVD</option><option>Non-Elektromedis</option></select></div>
+        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Nama Produk Medis</label><input type="text" id="lNamaProduk" placeholder="Nama Produk" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
         <div class="grid grid-cols-2 gap-3">
             <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Target QTY</label><input type="number" id="lQty" placeholder="0" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
             <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Tenggat</label><input type="date" id="lDeadline" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
@@ -445,10 +418,10 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbx_7yDsJsRkke62pM06npcxuTc2I26U7CKHDwiUUefNwWfNRXM67zW8rwXeRAODDmLa4g/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzzJuVWSLDXqP5oSN1A3s567nt2cqyLUMCd28eeHRfvXWIo15gYhjSomi5tcMAWbiWu3A/exec";
 
     var dataMaster = [];
-    var curUser = { logged: false, nama: "", email: "", isAdmin: false };
+    var curUser = { logged: false, nama: "", email: "", isAdmin: false, avatar: "" };
     var isFetching = false;
     var sidebarMobileOpen = false;
     var currentViewMode = 'kartu';
@@ -457,7 +430,6 @@
     var statChartInstance = null; 
     var barChartInstance = null; 
 
-    // FIX Fungsi tombol loading yang sempat hilang
     function setL(id, isLoading, text = '') {
         var btn = document.getElementById(id);
         if(!btn) return;
@@ -470,6 +442,7 @@
         }
     }
 
+    // MEMO AUTO POPUP
     function tampilkanPopupMemoDinamis(memoTerbaru) {
       Swal.fire({
         title: memoTerbaru.judul,
@@ -482,8 +455,10 @@
     }
 
     window.onload = function() { 
+        let stored = sessionStorage.getItem('userSession');
+        if(stored) { curUser = JSON.parse(stored); }
         mulaiJam(); updateAuthUI(); segarkan(); 
-        setInterval(() => { if (!isFetching && curUser.logged) segarkan(); }, 5000); 
+        setInterval(() => { if (!isFetching) segarkan(); }, 5000); 
     };
 
     async function callAPI(action, payload = {}) {
@@ -502,6 +477,7 @@
     function bukaModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
     function tutupModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
     function handleBackdropClick(event, id) { if (event.target === document.getElementById(id)) { tutupModal(id); } }
+    function bukaModalGantiFotoAman() { if(curUser.logged) bukaModal('modalGantiFoto'); else { Swal.fire('Akses Ditolak','Login terlebih dahulu','warning'); bukaModal('modalLogin'); } }
 
     function mulaiJam() {
       setInterval(() => {
@@ -556,7 +532,6 @@
 
     function updateAuthUI() {
       var area = document.getElementById('authStatusArea');
-      var sbCard = document.getElementById('sidebarProfileCard');
       
       if (curUser.logged) {
         let inisial = curUser.nama.substring(0,2).toUpperCase();
@@ -564,16 +539,22 @@
         
         document.getElementById('sbUserName').innerText = curUser.nama;
         document.getElementById('sbUserRole').innerText = roleName;
-        sbCard.classList.remove('hidden'); 
         document.getElementById('navUmumMenu').style.display = curUser.isAdmin ? 'block' : 'none';
         
-        var avatar = document.getElementById('sbAvatar');
-        avatar.outerHTML = `<div id="sbAvatar" class="w-12 h-12 rounded-xl border border-slate-600 shadow-inner bg-brand-600 text-white flex items-center justify-center font-bold text-lg">${inisial}</div>`;
-        document.getElementById('sbOnlineStatus').className = "absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-slate-800 z-20";
+        // PENGATURAN FOTO PROFIL SIDEBAR
+        var avaWrap = document.getElementById('avatarContainerWrapper');
+        if(curUser.avatar && curUser.avatar.startsWith('http')) {
+            avaWrap.innerHTML = `<img id="sbAvatar" src="${curUser.avatar}" class="w-24 h-24 rounded-full object-cover border-4 border-brand-500 shadow-lg bg-white transition group-hover:opacity-60" alt="User">`;
+        } else {
+            avaWrap.innerHTML = `<div id="sbAvatar" class="w-24 h-24 rounded-full border-4 border-brand-500 shadow-lg bg-brand-600 text-white flex items-center justify-center font-bold text-3xl transition group-hover:opacity-60">${inisial}</div>`;
+        }
+        document.getElementById('sbOnlineStatus').className = "absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 rounded-full border-4 border-slate-800 z-20";
 
         area.innerHTML = `
           <button onclick="toggleUserMenu(event)" class="bg-white pl-2 pr-4 py-1.5 rounded-full border border-slate-200 shadow-sm flex items-center gap-3 hover:border-brand-300 transition focus:outline-none">
-            <div class="w-9 h-9 bg-brand-600 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-inner">${inisial}</div>
+            <div class="w-9 h-9 bg-brand-600 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-inner overflow-hidden">
+                ${curUser.avatar ? `<img src="${curUser.avatar}" class="w-full h-full object-cover">` : inisial}
+            </div>
             <div class="text-left hidden sm:block"><p class="text-xs font-bold text-slate-800 leading-tight">${curUser.nama}</p><p class="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider">${roleName}</p></div>
             <i class="fas fa-chevron-down text-[10px] text-slate-400 sm:ml-2"></i>
           </button>
@@ -598,14 +579,11 @@
       } else {
         document.getElementById('sbUserName').innerText = "Tamu / Guest";
         document.getElementById('sbUserRole').innerText = "Pengunjung imedin.id";
-        sbCard.classList.remove('hidden');
         document.getElementById('navUmumMenu').style.display = 'none';
 
-        var avaTamu = document.getElementById('sbAvatar');
-        if(avaTamu.tagName !== 'IMG') {
-            avaTamu.outerHTML = `<img id="sbAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-12 h-12 rounded-xl object-cover border border-slate-600 shadow-inner bg-white" alt="User">`;
-        }
-        document.getElementById('sbOnlineStatus').className = "absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-slate-500 rounded-full border-2 border-slate-800 z-20";
+        var avaWrap = document.getElementById('avatarContainerWrapper');
+        avaWrap.innerHTML = `<img id="sbAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-24 h-24 rounded-full object-cover border-4 border-brand-500 shadow-lg bg-white transition group-hover:opacity-60" alt="User">`;
+        document.getElementById('sbOnlineStatus').className = "absolute bottom-1 right-1 w-5 h-5 bg-slate-500 rounded-full border-4 border-slate-800 z-20";
 
         area.innerHTML = `<button onclick="bukaModal('modalLogin')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg transition hover:-translate-y-0.5"><i class="fas fa-user-lock mr-2"></i> Akses Karyawan</button>`;
         document.getElementById('btnTambahLine').classList.add('hidden'); document.getElementById('btnExportCSV').classList.add('hidden');
@@ -622,7 +600,9 @@
       const res = await callAPI("verifikasiLogin", { email: e, pin: p });
       setL('btnLoginSubmit', false, 'Otorisasi Masuk');
       if (res.success) { 
-          curUser = res; curUser.logged = true; tutupModal('modalLogin'); updateAuthUI(); segarkan(); document.getElementById('loginPin').value=''; 
+          curUser = res; curUser.logged = true; 
+          sessionStorage.setItem('userSession', JSON.stringify(curUser));
+          tutupModal('modalLogin'); updateAuthUI(); segarkan(); document.getElementById('loginPin').value=''; 
           Swal.fire({title: 'Autentikasi Berhasil', text: `Selamat datang kembali, ${curUser.nama}!`, icon: 'success', timer: 2000, showConfirmButton: false, customClass: {popup: 'rounded-3xl'}});
       } 
       else { document.getElementById('loginErrorMsg').innerText = res.message; }
@@ -635,16 +615,33 @@
       if(res.success) { Swal.fire('Tersimpan', res.message, 'success'); tutupModal('modalGantiPin'); document.getElementById('pinLama').value=''; document.getElementById('pinBaru').value=''; } else { Swal.fire('Gagal', res.message, 'error'); }
     }
 
-    function submitGantiFoto() {
+    // UPDATE 2: PROSES GANTI FOTO VIA BASE64 API
+    async function submitGantiFoto() {
+        var f = document.getElementById('fotoBaru').files[0];
+        if (!f) return Swal.fire({text:'Pilih foto terlebih dahulu!', icon:'warning', customClass:{popup:'rounded-3xl'}});
+        if (f.size > 2 * 1024 * 1024) return Swal.fire({text:'Maksimal ukuran foto 2MB!', icon:'warning', customClass:{popup:'rounded-3xl'}});
+
         setL('btnSgantiFoto', true);
-        setTimeout(() => {
+        var reader = new FileReader();
+        reader.onload = async function(e) {
+            var b64 = e.target.result;
+            const res = await callAPI("updateAvatarUser", { email: curUser.email, avatarBase64: b64 });
             setL('btnSgantiFoto', false, 'Upload Foto Baru');
-            Swal.fire({title: 'Foto Diperbarui!', text: 'Fitur pembaruan foto akan terlihat setelah reload.', icon: 'success', customClass: {popup: 'rounded-3xl'}});
-            tutupModal('modalGantiFoto');
-        }, 1500);
+            
+            if (res.success) {
+                curUser.avatar = res.avatarUrl;
+                sessionStorage.setItem('userSession', JSON.stringify(curUser));
+                Swal.fire({title: 'Berhasil!', text: 'Foto profil diperbarui.', icon: 'success', timer: 1500, showConfirmButton: false, customClass:{popup:'rounded-3xl'}});
+                tutupModal('modalGantiFoto');
+                updateAuthUI(); 
+            } else {
+                Swal.fire({title: 'Gagal', text: res.message, icon: 'error', customClass:{popup:'rounded-3xl'}});
+            }
+        };
+        reader.readAsDataURL(f);
     }
     
-    function prosesLogout() { curUser = { logged: false, nama: "", email: "", isAdmin: false }; updateAuthUI(); segarkan(); }
+    function prosesLogout() { curUser = { logged: false, nama: "", email: "", isAdmin: false }; sessionStorage.removeItem('userSession'); updateAuthUI(); segarkan(); }
 
     function renderCharts(s, personnelData) {
       const ctx = document.getElementById('statChart'); if(!ctx) return;
@@ -681,21 +678,40 @@
       isFetching = true; const res = await callAPI("ambilDataDashboard"); isFetching = false;
       if(!res || !res.success) return; dataMaster = res; dataMaster.mentah = res.rawData; 
       
+      // UPDATE 4: LINI PRODUKSI DINAMIS ANIMATED
       var conProd = document.getElementById('containerProduksi'); conProd.innerHTML = '';
       if(res.listProduksiAktif.length === 0) { conProd.innerHTML = `<div class="col-span-full p-8 rounded-[1.5rem] border-2 border-dashed border-slate-200 text-center text-slate-400 font-bold text-sm bg-slate-50/50">Belum ada aktivitas manufaktur berjalan.</div>`; } 
       else {
         res.listProduksiAktif.forEach(l => {
           var bgBadge = l.remStatus === "OVERDUE" ? 'bg-rose-50 text-rose-600 border-rose-200' : (l.remStatus === "AMAN" ? 'bg-slate-50 text-slate-600 border-slate-200' : 'bg-amber-50 text-amber-600 border-amber-200');
+          var iconProduk = l.jenis.toLowerCase().includes('ivd') ? 'fa-vial' : (l.jenis.toLowerCase().includes('elektro') ? 'fa-bolt' : 'fa-box');
+          
           conProd.innerHTML += `
-          <div class="saas-card p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 hover-lift">
-            <div class="flex items-center gap-4 w-full md:w-auto">
-              <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 shadow-inner border border-brand-100"><i class="fas fa-box text-lg"></i></div>
-              <div><p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">${l.jenis}</p><h2 class="text-sm font-extrabold text-slate-900">${l.line} &bull; ${l.namaProduk}</h2></div>
+          <div class="saas-card p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 hover-lift relative overflow-hidden border-l-4 border-l-emerald-500 group">
+            
+            <div class="absolute -right-4 -top-4 text-slate-100 opacity-50 group-hover:rotate-90 transition duration-[3000ms]"><i class="fas fa-cog fa-spin text-7xl"></i></div>
+            
+            <div class="flex items-center gap-4 w-full md:w-auto relative z-10">
+              <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 shadow-inner border border-emerald-100">
+                <i class="fas ${iconProduk} text-lg"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <p class="text-[9px] font-extrabold text-emerald-500 uppercase tracking-widest animate-pulse">Sedang Berjalan</p>
+                </div>
+                <h2 class="text-sm font-extrabold text-slate-900 leading-tight">${l.line} &bull; ${l.namaProduk}</h2>
+                <p class="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-wider">${l.jenis}</p>
+              </div>
             </div>
-            <div class="flex gap-4 items-center w-full md:w-auto justify-between border-t md:border-0 pt-4 md:pt-0 border-slate-100">
+
+            <div class="flex gap-4 items-center w-full md:w-auto justify-between border-t md:border-0 pt-4 md:pt-0 border-slate-100 relative z-10">
               <div class="text-center px-4 border-r border-slate-200"><p class="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest">Target</p><p class="font-black text-slate-800 text-lg">${l.qty}</p></div>
               <div class="text-center px-2"><p class="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest mb-1">Tenggat</p><span class="text-[10px] font-bold px-2.5 py-1 rounded-md border ${bgBadge}">${l.remStatus}</span></div>
-              ${(curUser.logged && curUser.isAdmin) ? `<button onclick="selesaikanLineUI(${l.row})" class="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 w-9 h-9 rounded-xl flex items-center justify-center transition"><i class="fas fa-check"></i></button>` : ''}
+              ${(curUser.logged && curUser.isAdmin) ? `<button onclick="selesaikanLineUI(${l.row})" class="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 w-9 h-9 rounded-xl flex items-center justify-center transition" title="Tandai Selesai"><i class="fas fa-check"></i></button>` : ''}
             </div>
           </div>`;
         });
@@ -709,7 +725,7 @@
       if(res.reminders.length===0) boxR.innerHTML = '<p class="text-[11px] text-slate-500 italic bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">Belum ada target mendesak.</p>';
       res.reminders.sort((a,b) => a.diff - b.diff).forEach(r => { boxR.innerHTML += `<div onclick="lihatDetailTugas(${r.row})" class="bg-amber-900/20 border border-amber-500/20 p-3 rounded-xl cursor-pointer hover:bg-amber-900/40 transition flex justify-between items-center"><div class="truncate pr-2 w-3/4"><span class="text-[11px] font-bold text-amber-400 block">${r.nama}</span><span class="text-[10px] text-slate-300 truncate block mt-1">${r.pekerjaan}</span></div><span class="text-[9px] font-bold bg-amber-500/20 text-amber-300 px-2 py-1 rounded-md border border-amber-500/30">${r.statusHari}</span></div>`; });
 
-      // LOGIKA RENDER MEMO BARU
+      // UPDATE 1: LOGIKA RENDER MEMO BARU & ADMIN ONLY DELETE
       var boxM = document.getElementById('boxMemo');
       if (boxM) {
           boxM.innerHTML = '';
@@ -717,15 +733,17 @@
               boxM.innerHTML = '<p class="text-[11px] text-slate-500 italic bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">Belum ada pengumuman baru.</p>';
           } else {
               res.memos.forEach(m => {
+                  // Hapus cuma bisa sama Admin
+                  let btnHapusMemo = (curUser.logged && curUser.isAdmin) ? `<button onclick="hapusMemoUI(${m.row})" class="absolute top-2 right-2 text-indigo-400 hover:text-rose-400 hidden group-hover:block transition"><i class="fas fa-trash text-[10px]"></i></button>` : '';
                   boxM.innerHTML += `
                   <div class="bg-indigo-900/20 border border-indigo-500/20 p-3 rounded-xl group relative">
-                    ${(curUser.logged && curUser.isAdmin) ? `<button onclick="hapusMemoUI(${m.row})" class="absolute top-2 right-2 text-indigo-400 hover:text-rose-400 hidden group-hover:block transition"><i class="fas fa-trash text-[10px]"></i></button>` : ''}
+                    ${btnHapusMemo}
                     <span class="text-[11px] font-bold text-indigo-300 block pr-4">${m.judul}</span>
                     <span class="text-[10px] text-slate-300 block mt-1 leading-relaxed">${m.teks}</span>
                   </div>`;
               });
               
-              // Tampilkan popup jika ada memo terbaru dan belum dilihat di sesi ini
+              // Tampilkan popup default jika ada memo terbaru dan belum dilihat di sesi ini
               let memoBaru = res.memos[0]; 
               if (!sessionStorage.getItem('memoDilihat_' + memoBaru.row)) {
                   tampilkanPopupMemoDinamis(memoBaru);
@@ -845,34 +863,9 @@
     function hapusMemoUI(row) { Swal.fire({ title: 'Hapus Memo?', icon: 'warning', showCancelButton: true, confirmButtonColor:'#ef4444', customClass:{popup:'rounded-3xl', confirmButton:'rounded-xl', cancelButton:'rounded-xl'} }).then(async (r) => { if (r.isConfirmed) { await callAPI("hapusMemoServer", { row: row, adminEmail: curUser.email }); segarkan(); } }); }
     function hapusTugasUI(row) { Swal.fire({ title: 'Hapus Tugas?', text:'Data dihapus dari database.', icon: 'warning', showCancelButton: true, confirmButtonColor:'#ef4444', customClass:{popup:'rounded-3xl', confirmButton:'rounded-xl', cancelButton:'rounded-xl'} }).then(async (r) => { if (r.isConfirmed) { await callAPI("hapusTugasServer", { row: row, adminEmail: curUser.email }); tutupModal('modalList'); segarkan(); } }); }
     function selesaikanLineUI(row) { Swal.fire({ title: 'Tutup Lini Produksi?', icon: 'question', showCancelButton: true, confirmButtonColor:'#10b981', customClass:{popup:'rounded-3xl', confirmButton:'rounded-xl', cancelButton:'rounded-xl'} }).then(async (r) => { if (r.isConfirmed) { await callAPI("selesaikanLine", { row: row, userEmail: curUser.email }); segarkan(); } }); }
-    async function submitLine() { setL('btnSLine', true); const res = await callAPI("tambahLineProduksi", { line: document.getElementById('lNama').value, jenis: document.getElementById('lJenis').value, namaProduk: document.getElementById('lNamaProduk').value, qty: document.getElementById('lQty').value, deadline: document.getElementById('lDeadline').value, userEmail: curUser.email }); setL('btnSLine', false, 'Aktifkan Line'); if(res.success) { tutupModal('modalTambahLine'); segarkan(); } }
-    async function submitMemo() { setL('btnSMemo', true); const res = await callAPI("tambahMemo", { judul: document.getElementById('mJudul').value, teks: document.getElementById('mTeks').value, adminEmail: curUser.email }); setL('btnSMemo', false, 'Publikasikan Ke Tim'); if(res.success) { tutupModal('modalTambahMemo'); segarkan(); } }
+    async function submitLine() { setL('btnSLine', true); const res = await callAPI("tambahLineProduksi", { line: document.getElementById('lNama').value, jenis: document.getElementById('lJenis').value, namaProduk: document.getElementById('lNamaProduk').value, qty: document.getElementById('lQty').value, deadline: document.getElementById('lDeadline').value, userEmail: curUser.email }); setL('btnSLine', false, 'Jalankan Lini'); if(res.success) { tutupModal('modalTambahLine'); segarkan(); } }
+    async function submitMemo() { setL('btnSMemo', true); const res = await callAPI("tambahMemo", { judul: document.getElementById('mJudul').value, teks: document.getElementById('mTeks').value, adminEmail: curUser.email }); setL('btnSMemo', false, 'Publikasikan Ke Tim'); if(res.success) { tutupModal('modalTambahMemo'); segarkan(); document.getElementById('mJudul').value=''; document.getElementById('mTeks').value=''; } }
 
-    // INTEGRASI GEMINI AI
-    async function prosesAI() {
-        const inp = document.getElementById('aiInput').value;
-        if(!inp.trim()) return Swal.fire({text:'Tuliskan prompt / permintaan Anda terlebih dahulu.', icon:'warning', customClass:{popup:'rounded-3xl'}});
-        
-        let btn = document.getElementById('btnProsesAI');
-        setL('btnProsesAI', true);
-
-        const res = await callAPI("tanyaGemini", { prompt: inp });
-        
-        document.getElementById('aiResultBox').classList.remove('hidden');
-        if(res && res.success) {
-            document.getElementById('aiOutput').value = res.data;
-        } else {
-            document.getElementById('aiOutput').value = "Error dari backend: " + (res.message || "Pastikan Anda sudah menambahkan endpoint 'tanyaGemini' pada file Apps Script Anda.");
-        }
-
-        setL('btnProsesAI', false, 'Kirim ke Gemini AI');
-    }
-
-    function copyAIText() {
-        const txt = document.getElementById('aiOutput').value;
-        navigator.clipboard.writeText(txt);
-        Swal.fire({title:'Disalin!', icon:'success', timer:1000, showConfirmButton:false, customClass:{popup:'rounded-3xl'}});
-    }
   </script>
 </body>
 </html>
