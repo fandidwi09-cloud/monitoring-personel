@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Workspace Produksi - IMEDIN</title>
+  <!-- Deploy: google-apps-script/Code.gs → Apps Script spreadsheet Anda → salin URL Web App ke API_URL di bawah -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -827,7 +828,8 @@
 
   <!-- ==================== SCRIPTS ==================== -->
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwQHhkptCFMbX8M_LHehtKB4lCUnpQ_qTzvrAfk7jpCy_kx2DYGOUHb5n_TEHXoDFXRTw/exec";
+    // === PENTING: Ganti URL ini setelah Deploy Web App (lihat CARA-PASANG.txt) ===
+    const API_URL = "https://script.google.com/macros/s/AKfycbxe3-vQJRGPx2pCY9QOW8peCzHrWDNSmLy8DSX1Wpxzt7xG8vKHtOwmeNRrEvHd-x61qQ/exec";
 
     var dataMaster = { mentah:[], personel:{}, reminders:[], kendalaAktif:[], listProduksiAktif:[], memos:[], stats:{}, terlewatCount:0, upcomingCount:0 };
     var curUser    = { logged:false, nama:"", email:"", isAdmin:false, fotoUrl:"" };
@@ -896,6 +898,9 @@
     }
 
     async function callAPI(action,payload={}){
+      if(!API_URL||API_URL.indexOf('PASTE_URL')>=0){
+        return{success:false,message:'API_URL belum diset. Deploy Apps Script lalu paste URL Web App di index.html (lihat CARA-PASANG.txt).'};
+      }
       const showLoader=(action!=="ambilDataDashboard");
       if(showLoader){const L=document.getElementById('globalLoader');L.classList.remove('hidden');L.classList.add('flex');}
       try{
@@ -1125,20 +1130,19 @@
       try{
         var b64=await readFileAsBase64(f);
         var res=await callAPI('updateFotoUser',{email:curUser.email,fotoBase64:b64,namaFile:f.name,userEmail:curUser.email});
-        var fotoUrl=(res&&res.success&&(res.fotoUrl||res.url))?(res.fotoUrl||res.url):b64;
+        if(!res||!res.success){
+          setL('btnSgantiFoto',false,'Upload Foto Baru');
+          return Swal.fire({title:'Gagal',text:(res&&res.message)||'Upload gagal.',icon:'error',customClass:{popup:'rounded-3xl'}});
+        }
+        var fotoUrl=res.fotoUrl||res.url||b64;
         curUser.fotoUrl=fotoUrl;
-        setLocalAvatar(curUser.email,b64);
+        setLocalAvatar(curUser.email,fotoUrl);
         persistSession();
         updateAuthUI();
         renderHalamanAkun();
         setL('btnSgantiFoto',false,'Upload Foto Baru');
         document.getElementById('fotoBaru').value='';
-        var okServer=res&&res.success;
-        Swal.fire({
-          title:okServer?'Foto Diperbarui!':'Foto Disimpan',
-          text:okServer?(res.message||'Avatar berhasil diperbarui.'):'Foto tampil di perangkat ini. Jika backend belum mendukung upload, hubungi admin untuk mengaktifkan action updateFotoUser di Google Apps Script.',
-          icon:'success',customClass:{popup:'rounded-3xl'}
-        });
+        Swal.fire({title:'Foto Diperbarui!',text:res.message||'Avatar tersimpan di cloud.',icon:'success',customClass:{popup:'rounded-3xl'}});
         tutupModal('modalGantiFoto');
       }catch(e){
         setL('btnSgantiFoto',false,'Upload Foto Baru');
