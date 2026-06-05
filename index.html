@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IMEDIN Workspace — PrdIMD OS 2026</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230d82e3'/%3E%3Ctext x='50' y='58' font-size='52' text-anchor='middle' fill='%23ffffff' font-family='DM Sans, sans-serif' font-weight='700'%3EIM%3C/text%3E%3C/svg%3E" type="image/svg+xml">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +36,7 @@
   </script>
   <style>
     :root {
-      --bg-page: #f0f5fb;
+      --bg-page: #f7fafc;
       --sidebar-bg: #020b18;
       --sidebar-border: rgba(13,130,227,0.15);
       --card-bg: #ffffff;
@@ -52,10 +53,14 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
     body{
-      background:var(--bg-page);
-      color:var(--text-primary);
+      background:radial-gradient(circle at top left, #071428 12%, #0b2c57 35%, #020b18 100%);
+      color:#e8f3ff;
       font-family:'DM Sans',sans-serif;
       -webkit-font-smoothing:antialiased;
+    }
+
+    main{
+      background:linear-gradient(180deg, rgba(2,11,24,.95) 0%, rgba(4,28,57,.95) 100%);
     }
 
     /* ─── Scrollbar ─── */
@@ -100,29 +105,39 @@
 
     /* ─── Sidebar ─── */
     #mainSidebar{
-      background:var(--sidebar-bg);
+      background:linear-gradient(180deg,#061826,#0f3353);
       background-image:
-        radial-gradient(ellipse at top left, rgba(13,130,227,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse at bottom right, rgba(0,72,160,0.08) 0%, transparent 60%);
+        radial-gradient(ellipse at top left, rgba(13,130,227,0.14) 0%, transparent 58%),
+        radial-gradient(ellipse at bottom right, rgba(0,72,160,0.1) 0%, transparent 62%);
     }
     .sidebar-menu-item{
       display:flex;align-items:center;gap:11px;
-      padding:10px 14px;border-radius:12px;
-      color:rgba(160,190,220,0.75);
-      font-weight:600;font-size:12px;
+      padding:12px 16px;border-radius:14px;
+      color:rgba(255,255,255,0.9);
+      font-weight:700;font-size:13px;
       width:100%;text-align:left;
-      transition:all .2s;cursor:pointer;
-      border:none;background:transparent;
-      letter-spacing:.015em;
+      transition:all .22s ease;cursor:pointer;
+      border:none;background:rgba(255,255,255,0.04);
+      letter-spacing:.02em;
     }
+    .sidebar-menu-item:hover{
+      background:rgba(255,255,255,0.12);
+      color:#ffffff;
+    }
+    .sidebar-menu-item.active{
+      background:rgba(13,130,227,.95);
+      color:#ffffff;
+      box-shadow:0 10px 25px rgba(0,0,0,.18);
+    }
+    .sidebar-transition{transition:transform .26s ease, width .26s ease, box-shadow .26s ease;}
     .sidebar-menu-item:hover{
       background:rgba(13,130,227,0.1);
       color:#e2ecf5;
     }
     .sidebar-menu-item.active{
-      background:linear-gradient(135deg,#0d82e3,#0049a0);
+      background:rgba(13,130,227,.95);
       color:#fff;
-      box-shadow:0 4px 16px rgba(13,130,227,0.4);
+      box-shadow:0 8px 22px rgba(13,130,227,.25);
     }
     .sidebar-menu-item i{width:16px;text-align:center;font-size:13px}
 
@@ -226,10 +241,11 @@
     /* ─── Section bar ─── */
     .section-bar{
       display:flex;flex-direction:column;gap:12px;
-      background:#fff;padding:16px 20px;
+      background:rgba(13,130,227,.10);
       border-radius:var(--radius-xl);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow-sm);
+      border:1px solid rgba(13,130,227,.2);
+      box-shadow:0 10px 40px rgba(0,0,0,.12);
+      color:#f8fbff;
     }
     @media(min-width:768px){.section-bar{flex-direction:row;align-items:center;justify-content:space-between}}
 
@@ -305,6 +321,27 @@
     }
     .view-btn-idle{color:#5a7090;font-weight:600;background:transparent;border:1px solid transparent}
 
+    .mobile-nav-item{
+      border:1px solid transparent;
+      min-height:68px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      transition:all .2s ease;
+      color:#e2ecf5;
+    }
+    .mobile-nav-item:hover{
+      background:rgba(255,255,255,.08);
+      color:#ffffff;
+    }
+    .mobile-nav-item.active{
+      color:#ffffff;
+      background:rgba(13,130,227,.25);
+      border-color:rgba(255,255,255,.15);
+    }
+    .mobile-auth-only.hidden{display:none !important;}
+
     /* ─── Table ─── */
     #listBody tr:hover{background:#f8fafc}
 
@@ -330,6 +367,11 @@
       background:linear-gradient(135deg,#020b18 0%,#002055 50%,#003278 100%);
       position:relative;overflow:hidden;
     }
+    .header-bar.bg-white{
+      background:#ffffff;
+      box-shadow:0 10px 35px rgba(15,23,42,.08);
+    }
+    .header-bar.bg-white::before{display:none;}
     .header-bar::before{
       content:'';position:absolute;inset:0;
       background:radial-gradient(ellipse at 70% 50%, rgba(13,130,227,.25) 0%, transparent 60%);
@@ -391,17 +433,21 @@
 
     /* ─── Page header ─── */
     .page-header{
-      background:linear-gradient(135deg,#020b18,#003278);
+      background:linear-gradient(135deg,#062143,#0d4d8f);
       border-radius:1.5rem;
       padding:24px 28px;
       position:relative;overflow:hidden;
-      border:1px solid rgba(13,130,227,.2);
+      border:1px solid rgba(255,255,255,.08);
+      color:#ffffff;
+    }
+    .page-header h1, .page-header h2, .page-header h3, .page-header p, .page-header button{
+      color:#f8fbff;
     }
     .page-header::after{
       content:'';position:absolute;
-      width:200px;height:200px;
-      background:radial-gradient(circle,rgba(13,130,227,.2),transparent);
-      top:-50px;right:-30px;border-radius:50%;
+      width:220px;height:220px;
+      background:radial-gradient(circle,rgba(34,211,238,.18),transparent);
+      top:-60px;right:-40px;border-radius:50%;
     }
 
     /* ─── Memo card ─── */
@@ -429,18 +475,18 @@
   <div id="sidebarOverlay" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden" onclick="toggleSidebarMobile()"></div>
 
   <!-- MOBILE HEADER -->
-  <header class="header-bar text-white p-4 flex justify-between items-center md:hidden shrink-0 z-40 shadow-xl">
+  <header class="header-bar bg-brand-900/95 text-white p-4 flex justify-between items-center md:hidden shrink-0 z-40 shadow-xl">
     <a href="#" onclick="handleLogoClick(event)" class="flex items-center gap-3 relative z-10">
-      <div class="w-10 h-10 rounded-xl overflow-hidden bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
-        <img src="logo.png" alt="Logo" class="h-8 w-auto object-contain" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <span style="display:none" class="text-white font-black text-sm">IMI</span>
+      <div class="w-12 h-12 rounded-3xl overflow-hidden bg-white border border-slate-200 flex items-center justify-center shadow-sm">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230d82e3'/%3E%3Ctext x='50' y='58' font-size='46' text-anchor='middle' fill='%23ffffff' font-family='DM Sans, sans-serif' font-weight='700'%3EIM%3C/text%3E%3C/svg%3E" alt="Logo" class="h-10 w-auto object-contain">
+        <span style="display:none" class="text-brand-700 font-black text-base">IMI</span>
       </div>
       <div>
         <h2 class="text-sm font-extrabold tracking-tight">PT INOVASI MEDIK INDONESIA</h2>
-        <p class="text-[10px] text-cyan-400 font-bold font-mono">IMEDIN WORKSPACE</p>
+        <p class="text-[10px] text-slate-500 font-bold font-mono">IMEDIN WORKSPACE</p>
       </div>
     </a>
-    <button onclick="toggleSidebarMobile()" class="text-white text-xl p-2.5 rounded-xl hover:bg-white/10 transition border border-white/10">
+    <button onclick="toggleSidebarMobile()" class="text-slate-700 text-xl p-2.5 rounded-xl hover:bg-slate-100 transition border border-slate-200">
       <i id="hamburgerIcon" class="fas fa-bars"></i>
     </button>
   </header>
@@ -451,15 +497,15 @@
     <!-- Logo -->
     <div class="flex justify-between items-center px-5 py-5 border-b border-[rgba(13,130,227,0.12)] md:block">
       <a href="#" onclick="handleLogoClick(event)" class="flex items-center gap-3 hover:opacity-85 transition-opacity">
-        <div class="w-12 h-12 rounded-2xl overflow-hidden bg-white/10 backdrop-blur border border-white/15 flex items-center justify-center shadow-lg">
-          <img src="logo.png" alt="Logo IMI" class="h-10 w-auto object-contain p-1" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <span style="display:none" class="text-white font-black text-base">IMI</span>
+        <div class="w-14 h-14 rounded-3xl overflow-hidden bg-white border border-slate-200 flex items-center justify-center shadow-xl">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230d82e3'/%3E%3Ctext x='50' y='58' font-size='46' text-anchor='middle' fill='%23ffffff' font-family='DM Sans, sans-serif' font-weight='700'%3EIM%3C/text%3E%3C/svg%3E" alt="Logo IMI" class="h-12 w-auto object-contain p-1">
+          <span style="display:none" class="text-brand-700 font-black text-lg">IMI</span>
         </div>
         <div>
           <h2 class="text-[12px] font-extrabold text-white tracking-wide leading-tight">PT INOVASI MEDIK<br>INDONESIA</h2>
           <div class="flex items-center gap-1.5 mt-1">
             <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full icon-pulse"></span>
-            <p class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest font-mono">Live Monitor</p>
+            <p class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest font-mono" data-i18n="liveMonitor">Live Monitor</p>
           </div>
         </div>
       </a>
@@ -483,25 +529,25 @@
     <!-- Nav -->
     <div class="px-3 flex-1 overflow-y-auto space-y-0.5 pb-4 scrollbar-none">
       <button onclick="navigateTo('dashboard')" id="navDashboard" class="sidebar-menu-item active">
-        <i class="fas fa-chart-pie"></i> Dashboard
+        <i class="fas fa-chart-pie"></i> <span data-i18n="dashboardTitle">Dashboard</span>
       </button>
       <button onclick="navigateTo('pekerjaan')" id="navPekerjaan" class="sidebar-menu-item hidden">
-        <i class="fas fa-briefcase"></i> Pekerjaan Saya
+        <i class="fas fa-briefcase"></i> <span data-i18n="myTasksLabel">Pekerjaan Saya</span>
       </button>
       <button onclick="navigateTo('akun')" id="navAkun" class="sidebar-menu-item hidden">
-        <i class="fas fa-user-circle"></i> Akun Saya
+        <i class="fas fa-user-circle"></i> <span data-i18n="myAccountLabel">Akun Saya</span>
       </button>
 
       <div id="dividerAdmin" class="hidden">
-        <p class="sidebar-divider-label">Menu Admin</p>
+        <p class="sidebar-divider-label" data-i18n="adminMenuLabel">Menu Admin</p>
         <button onclick="bukaModal('modalTambahMemo')" class="sidebar-menu-item">
-          <i class="fas fa-bullhorn"></i> Rilis Note Baru
+          <i class="fas fa-bullhorn"></i> <span data-i18n="releaseNoteButton">Rilis Note Baru</span>
         </button>
       </div>
 
       <div class="pt-4">
         <p class="sidebar-divider-label flex items-center gap-2">
-          <i class="fas fa-bullhorn text-cyan-500 icon-swing" style="font-size:9px"></i> Note Tim
+          <i class="fas fa-bullhorn text-cyan-500 icon-swing" style="font-size:9px"></i> <span data-i18n="noteTeamLabel">Note Tim</span>
         </p>
         <div id="boxMemoSidebar" class="space-y-2 max-h-48 overflow-y-auto pr-1 scrollbar-none break-words"></div>
       </div>
@@ -517,7 +563,7 @@
   </aside>
 
   <!-- ═══════════ MAIN CONTENT ═══════════ -->
-  <main class="flex-1 overflow-y-auto w-full relative bg-grid">
+  <main class="flex-1 overflow-y-auto w-full relative bg-grid pb-24 md:pb-0">
 
     <!-- ══ PAGE: DASHBOARD ══ -->
     <div id="pageDashboard" class="page-section active p-4 md:p-7 space-y-6">
@@ -526,14 +572,20 @@
       <div class="page-header">
         <div class="relative z-10 flex justify-between items-start">
           <div>
-            <p class="text-[10px] font-bold text-cyan-400 uppercase tracking-[.2em] font-mono mb-2">IMEDIN Workspace</p>
+            <p data-i18n="workspaceLabel" class="text-[10px] font-bold text-cyan-400 uppercase tracking-[.2em] font-mono mb-2">IMEDIN Workspace</p>
             <h1 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
               <i class="fas fa-chart-pie text-brand-300"></i>
-              <span class="grad-text">DASHBOARD</span>
+              <span data-i18n="dashboardTitle" class="grad-text">DASHBOARD</span>
             </h1>
-            <p class="text-xs text-slate-400 mt-1.5 font-medium">Pantau performa operasional tim IMEDIN secara real-time.</p>
+            <p data-i18n="dashboardSubtitle" class="text-xs text-slate-400 mt-1.5 font-medium">Pantau performa operasional tim IMEDIN secara real-time.</p>
           </div>
-          <div id="authStatusArea" class="shrink-0 relative z-10"></div>
+          <div class="shrink-0 relative z-10 flex items-center gap-3">
+            <button id="langToggle" onclick="switchLanguage()" class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] text-white font-bold transition hover:bg-white/20 shadow-sm">
+              <i class="fas fa-language"></i>
+              <span id="langToggleLabel">EN</span>
+            </button>
+            <div id="authStatusArea" class="relative"></div>
+          </div>
         </div>
       </div>
 
@@ -654,7 +706,7 @@
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
             <div class="relative flex-1 sm:flex-none sm:w-56 group">
               <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs group-focus-within:text-brand-500 transition-colors"></i>
-              <input type="text" id="searchInput" onkeyup="filterTugasLokal()" placeholder="Cari tugas, nama..." class="w-full bg-slate-50 border border-slate-200 pl-9 pr-9 py-2.5 rounded-xl text-[12px] font-medium focus:bg-white outline-none">
+              <input type="text" id="searchInput" onkeyup="filterTugasLokal()" placeholder="Cari tugas, nama..." data-i18n-placeholder="searchPlaceholder" class="w-full bg-slate-50 border border-slate-200 pl-9 pr-9 py-2.5 rounded-xl text-[12px] font-medium focus:bg-white outline-none">
               <button onclick="document.getElementById('searchInput').value='';filterTugasLokal();" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-600 text-xs transition"><i class="fas fa-times"></i></button>
             </div>
             <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
@@ -688,17 +740,17 @@
       <div class="page-header">
         <div class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <p class="text-[10px] font-bold text-cyan-400 uppercase tracking-[.2em] font-mono mb-1.5">Personal</p>
-            <h1 class="text-xl font-extrabold text-white flex items-center gap-2"><i class="fas fa-briefcase text-brand-300"></i> Pekerjaan Saya</h1>
-            <p class="text-xs text-slate-400 mt-0.5">Semua pekerjaan yang ditugaskan &amp; di-tag kepada Anda.</p>
+            <p class="text-[10px] font-bold text-cyan-400 uppercase tracking-[.2em] font-mono mb-1.5" data-i18n="myTasksLabel">Personal</p>
+            <h1 class="text-xl font-extrabold text-white flex items-center gap-2"><i class="fas fa-briefcase text-brand-300"></i> <span data-i18n="myTasksLabel">Pekerjaan Saya</span></h1>
+            <p class="text-xs text-slate-400 mt-0.5" data-i18n="myTasksSubtitle">Semua pekerjaan yang ditugaskan &amp; di-tag kepada Anda.</p>
           </div>
-          <button onclick="aksiTambahTugas()" class="btn-primary text-white font-bold text-xs px-5 py-2.5 rounded-xl shrink-0 flex items-center gap-1.5">
-            <i class="fas fa-plus"></i> Input Pekerjaan
+          <button onclick="aksiTambahTugas()" class="btn-primary text-white font-bold text-xs px-5 py-2.5 rounded-xl shrink-0 flex items-center gap-1.5" id="btnAddTaskPage">
+            <i class="fas fa-plus"></i> <span data-i18n="newTaskButton">Input Pekerjaan</span>
           </button>
         </div>
       </div>
       <div id="containerPekerjaanSaya" class="space-y-3 pb-10">
-        <div class="text-center py-12 text-slate-400 font-semibold text-sm">Memuat data pekerjaan...</div>
+        <div class="text-center py-12 text-slate-400 font-semibold text-sm" data-i18n="loadingTasks">Memuat data pekerjaan...</div>
       </div>
     </div>
 
@@ -706,9 +758,9 @@
     <div id="pageAkun" class="page-section p-4 md:p-7 space-y-5">
       <div class="page-header">
         <div class="relative z-10">
-          <p class="text-[10px] font-bold text-cyan-400 uppercase tracking-[.2em] font-mono mb-1.5">Settings</p>
-          <h1 class="text-xl font-extrabold text-white flex items-center gap-2"><i class="fas fa-user-circle text-brand-300"></i> Pengaturan Akun</h1>
-          <p class="text-xs text-slate-400 mt-0.5">Kelola profil dan keamanan akun Anda.</p>
+          <p class="text-[10px] font-bold text-cyan-400 uppercase tracking-[.2em] font-mono mb-1.5" data-i18n="myAccountLabel">Settings</p>
+          <h1 class="text-xl font-extrabold text-white flex items-center gap-2"><i class="fas fa-user-circle text-brand-300"></i> <span data-i18n="accountHeader">Pengaturan Akun</span></h1>
+          <p class="text-xs text-slate-400 mt-0.5" data-i18n="accountSubtitle">Kelola profil dan keamanan akun Anda.</p>
         </div>
       </div>
 
@@ -739,23 +791,40 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="akun-action-card p-5 flex items-center gap-4" onclick="bukaModal('modalGantiFoto')">
           <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl shrink-0 border border-indigo-100"><i class="fas fa-camera"></i></div>
-          <div class="flex-1"><h3 class="font-bold text-slate-900 text-sm">Ubah Foto Profil</h3><p class="text-xs text-slate-500 mt-0.5">Upload avatar akun Anda</p></div>
+          <div class="flex-1"><h3 class="font-bold text-slate-900 text-sm" data-i18n="changePhoto">Ubah Foto Profil</h3><p class="text-xs text-slate-500 mt-0.5" data-i18n="changePhotoDesc">Upload avatar akun Anda</p></div>
           <i class="fas fa-chevron-right text-slate-300 ml-auto"></i>
         </div>
         <div class="akun-action-card p-5 flex items-center gap-4" onclick="bukaModal('modalGantiPin')">
           <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center text-xl shrink-0 border border-amber-100"><i class="fas fa-key icon-swing"></i></div>
-          <div class="flex-1"><h3 class="font-bold text-slate-900 text-sm">Ubah PIN</h3><p class="text-xs text-slate-500 mt-0.5">Perbarui keamanan login</p></div>
+          <div class="flex-1"><h3 class="font-bold text-slate-900 text-sm" data-i18n="changePin">Ubah PIN</h3><p class="text-xs text-slate-500 mt-0.5" data-i18n="changePinDesc">Perbarui keamanan login</p></div>
           <i class="fas fa-chevron-right text-slate-300 ml-auto"></i>
         </div>
         <div class="akun-action-card p-5 flex items-center gap-4 sm:col-span-2" onclick="prosesLogout()">
           <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center text-xl shrink-0 border border-rose-100"><i class="fas fa-sign-out-alt"></i></div>
-          <div class="flex-1"><h3 class="font-bold text-rose-600 text-sm">Keluar</h3><p class="text-xs text-slate-500 mt-0.5">Akhiri sesi dan logout</p></div>
+          <div class="flex-1"><h3 class="font-bold text-rose-600 text-sm" data-i18n="logout">Keluar</h3><p class="text-xs text-slate-500 mt-0.5" data-i18n="logoutDesc">Akhiri sesi dan logout</p></div>
           <i class="fas fa-chevron-right text-slate-300 ml-auto"></i>
         </div>
       </div>
     </div>
 
   </main>
+
+  <div id="mobileNavBar" class="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-brand-950/95 border-t border-brand-500/10 backdrop-blur-sm shadow-xl">
+    <div class="max-w-5xl mx-auto px-3 py-2 grid grid-cols-3 gap-2">
+      <button data-page="dashboard" onclick="navigateTo('dashboard');" class="mobile-nav-item rounded-2xl py-2 hover:text-white transition">
+        <i class="fas fa-chart-pie text-base mb-1"></i>
+        <span class="text-[10px] font-semibold" data-i18n="mobileDashboard">Dashboard</span>
+      </button>
+      <button data-page="pekerjaan" onclick="navigateTo('pekerjaan');" class="mobile-nav-item mobile-auth-only rounded-2xl py-2 hover:text-white transition">
+        <i class="fas fa-briefcase text-base mb-1"></i>
+        <span class="text-[10px] font-semibold" data-i18n="mobileTasks">Pekerjaan</span>
+      </button>
+      <button data-page="akun" onclick="navigateTo('akun');" class="mobile-nav-item mobile-auth-only rounded-2xl py-2 hover:text-white transition">
+        <i class="fas fa-user-circle text-base mb-1"></i>
+        <span class="text-[10px] font-semibold" data-i18n="mobileAccount">Akun</span>
+      </button>
+    </div>
+  </div>
 
   <!-- FAB Help -->
   <button onclick="bukaModal('modalSOP')" class="fixed bottom-7 right-7 bg-gradient-to-br from-brand-500 to-brand-700 hover:from-brand-400 hover:to-brand-600 text-white w-[52px] h-[52px] rounded-full shadow-lg shadow-brand-500/30 flex items-center justify-center text-lg transition hover:-translate-y-1 active:scale-95 z-30 border-2 border-white/20">
@@ -769,24 +838,24 @@
     <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 relative text-center border border-slate-100 modal-box">
       <button onclick="tutupModal('modalLogin')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-800 text-xl transition"><i class="fas fa-times"></i></button>
       <div class="w-16 h-16 rounded-2xl btn-primary flex items-center justify-center mx-auto mb-5 text-2xl shadow-lg text-white"><i class="fas fa-user-lock"></i></div>
-      <h3 class="font-extrabold text-xl text-slate-900 mb-1.5">Masuk ke Sistem</h3>
-      <p class="text-xs text-slate-500 mb-6 font-medium">Masukkan akun IMEDIN Anda</p>
+      <h3 class="font-extrabold text-xl text-slate-900 mb-1.5" data-i18n="loginModalTitle">Masuk ke Sistem</h3>
+      <p class="text-xs text-slate-500 mb-6 font-medium" data-i18n="loginModalSubtitle">Masukkan akun IMEDIN Anda</p>
       <form onsubmit="event.preventDefault();prosesLogin();" class="space-y-4 text-left">
         <div>
-          <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1.5">Email</label>
-          <input type="email" id="loginEmail" class="w-full border border-slate-200 p-3.5 rounded-xl text-sm font-medium bg-slate-50 focus:bg-white" required placeholder="email@imedin.id">
+          <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1.5" data-i18n="loginModalEmailLabel">Email</label>
+          <input type="email" id="loginEmail" class="w-full border border-slate-200 p-3.5 rounded-xl text-sm font-medium bg-slate-50 focus:bg-white" required placeholder="email@imedin.id" data-i18n-placeholder="loginModalEmailPlaceholder">
         </div>
         <div>
-          <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1.5">PIN</label>
-          <input type="password" id="loginPin" class="w-full border border-slate-200 p-3.5 rounded-xl text-center tracking-[0.5em] text-lg font-bold bg-slate-50 focus:bg-white" required placeholder="••••">
+          <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1.5" data-i18n="loginModalPinLabel">PIN</label>
+          <input type="password" id="loginPin" class="w-full border border-slate-200 p-3.5 rounded-xl text-center tracking-[0.5em] text-lg font-bold bg-slate-50 focus:bg-white" required placeholder="••••" data-i18n-placeholder="loginModalPinPlaceholder">
         </div>
         <div class="flex items-center gap-2 text-left">
           <input type="checkbox" id="loginRemember" class="w-4 h-4 rounded border-slate-300 text-brand-500" checked>
-          <label for="loginRemember" class="text-xs text-slate-500 font-medium cursor-pointer">Ingat saya di perangkat ini</label>
+          <label for="loginRemember" class="text-xs text-slate-500 font-medium cursor-pointer" data-i18n="rememberDevice">Ingat saya di perangkat ini</label>
         </div>
         <p id="loginErrorMsg" class="text-xs text-rose-500 font-bold min-h-[16px]"></p>
-        <button type="submit" id="btnLoginSubmit" class="w-full btn-primary py-4 rounded-xl font-bold text-sm flex justify-center items-center">Otorisasi Masuk</button>
-        <button type="button" onclick="tutupModal('modalLogin');bukaModalLupaPin();" class="w-full text-[11px] text-brand-500 hover:text-brand-700 font-semibold text-center transition py-1">Lupa PIN?</button>
+        <button type="submit" id="btnLoginSubmit" class="w-full btn-primary py-4 rounded-xl font-bold text-sm flex justify-center items-center" data-i18n="loginModalSubmit">Otorisasi Masuk</button>
+        <button type="button" onclick="tutupModal('modalLogin');bukaModalLupaPin();" class="w-full text-[11px] text-brand-500 hover:text-brand-700 font-semibold text-center transition py-1" data-i18n="forgotPin">Lupa PIN?</button>
       </form>
     </div>
   </div>
@@ -796,11 +865,11 @@
     <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-8 relative border border-slate-100 text-center modal-box">
       <button onclick="tutupModal('modalGantiPin')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-800 text-xl transition"><i class="fas fa-times"></i></button>
       <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl border border-amber-100"><i class="fas fa-key"></i></div>
-      <h3 class="font-extrabold text-lg text-slate-900 mb-6">Ubah Kode PIN</h3>
+      <h3 class="font-extrabold text-lg text-slate-900 mb-6" data-i18n="changePinModalTitle">Ubah Kode PIN</h3>
       <form onsubmit="event.preventDefault();submitGantiPin();" class="space-y-4 text-left">
-        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1.5">PIN Saat Ini</label><input type="password" id="pinLama" class="w-full border border-slate-200 p-3.5 rounded-xl text-center tracking-[0.5em] text-lg font-bold bg-slate-50 focus:bg-white" required placeholder="••••"></div>
-        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1.5">PIN Baru (Min 4)</label><input type="password" id="pinBaru" class="w-full border border-slate-200 p-3.5 rounded-xl text-center tracking-[0.5em] text-lg font-bold bg-slate-50 focus:bg-white" required placeholder="••••"></div>
-        <button type="submit" id="btnSgantiPin" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold text-sm shadow-lg mt-4 transition flex justify-center items-center">Simpan PIN</button>
+        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1.5" data-i18n="currentPinLabel">PIN Saat Ini</label><input type="password" id="pinLama" class="w-full border border-slate-200 p-3.5 rounded-xl text-center tracking-[0.5em] text-lg font-bold bg-slate-50 focus:bg-white" required placeholder="••••" data-i18n-placeholder="pinPlaceholder"></div>
+        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1.5" data-i18n="newPinLabel">PIN Baru (Min 4)</label><input type="password" id="pinBaru" class="w-full border border-slate-200 p-3.5 rounded-xl text-center tracking-[0.5em] text-lg font-bold bg-slate-50 focus:bg-white" required placeholder="••••" data-i18n-placeholder="pinPlaceholder"></div>
+        <button type="submit" id="btnSgantiPin" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold text-sm shadow-lg mt-4 transition flex justify-center items-center" data-i18n="savePinButton">Simpan PIN</button>
       </form>
     </div>
   </div>
@@ -937,7 +1006,7 @@
   <div id="modalUpdate" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[999]" onclick="handleBackdropClick(event,'modalUpdate')">
     <div class="bg-white rounded-[2rem] shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 flex flex-col max-h-[92vh] modal-box">
       <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
-        <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2"><i class="fas fa-edit text-brand-500"></i> Update Progress</h3>
+        <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2"><i class="fas fa-edit text-brand-500"></i> <span data-i18n="updateProgressTitle">Update Progress</span></h3>
         <button onclick="tutupModal('modalUpdate')" class="w-8 h-8 rounded-full bg-slate-200/60 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"><i class="fas fa-times text-sm"></i></button>
       </div>
       <div class="overflow-y-auto flex-1 p-6">
@@ -945,22 +1014,22 @@
           <input type="hidden" id="uRow">
           <input type="hidden" id="uBuktiLama">
           <div class="bg-brand-50/60 p-4 rounded-2xl border border-brand-100/70">
-            <p class="text-[9px] font-extrabold text-brand-500 uppercase tracking-widest mb-1">Pekerjaan</p>
+            <p class="text-[9px] font-extrabold text-brand-500 uppercase tracking-widest mb-1" data-i18n="taskLabel">Pekerjaan</p>
             <p id="uPekerjaanLbl" class="font-bold text-sm text-slate-900 leading-tight"></p>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Status</label>
+              <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2" data-i18n="statusLabel">Status</label>
               <select id="uStatus" class="w-full border border-slate-200 p-3 rounded-xl text-xs font-semibold bg-white">
-                <option value="Sedang Berjalan">Masih Proses</option>
-                <option value="Menunggu Approval">Selesai</option>
+                <option value="Sedang Berjalan" data-i18n="statusOngoing">Masih Proses</option>
+                <option value="Menunggu Approval" data-i18n="statusDone">Selesai</option>
               </select>
             </div>
             <div>
-              <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2">Kendala</label>
+              <label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-2" data-i18n="issueLabel">Kendala</label>
               <select id="uKendala" onchange="toggleKendalaInput()" class="w-full border border-slate-200 p-3 rounded-xl text-xs font-semibold bg-white">
-                <option value="Tidak">Tidak Ada</option>
-                <option value="Ada">Ada Kendala</option>
+                <option value="Tidak" data-i18n="issueNone">Tidak Ada</option>
+                <option value="Ada" data-i18n="issueHas">Ada Kendala</option>
               </select>
             </div>
           </div>
@@ -1164,6 +1233,193 @@
     // ── LocalStorage keys ──
     const LS_USER_KEY = 'imedin_user_session';
     const LS_PHOTO_KEY = 'imedin_user_photo_';
+    const LS_LANG_KEY = 'imedin_lang';
+    var locale = localStorage.getItem(LS_LANG_KEY) || 'id';
+    var translations = {
+      id: {
+        workspaceLabel: 'IMEDIN Workspace',
+        dashboardTitle: 'DASHBOARD',
+        dashboardSubtitle: 'Pantau performa operasional tim IMEDIN secara real-time.',
+        myTasksLabel: 'Pekerjaan Saya',
+        myTasksSubtitle: 'Semua pekerjaan yang ditugaskan & di-tag kepada Anda.',
+        myAccountLabel: 'Akun Saya',
+        accountHeader: 'Pengaturan Akun',
+        accountSubtitle: 'Kelola profil dan keamanan akun Anda.',
+        adminMenuLabel: 'Menu Admin',
+        releaseNoteButton: 'Rilis Note Baru',
+        noteTeamLabel: 'Note Tim',
+        searchPlaceholder: 'Cari tugas, nama...',
+        gridLabel: 'Grid',
+        timelineLabel: 'Timeline',
+        exportLabel: 'Export',
+        newTaskButton: 'Input Pekerjaan',
+        loginStaff: 'Login Staff',
+        signIn: 'Masuk Sistem',
+        forgotPin: 'Lupa PIN?',
+        emailPlaceholder: 'Email',
+        pinPlaceholder: 'P I N',
+        loginRequiredTitle: 'Login Diperlukan',
+        loginRequiredText: 'Silakan masuk dulu untuk mengakses fitur ini.',
+        loginModalTitle: 'Masuk ke Sistem',
+        loginModalSubtitle: 'Masukkan akun IMEDIN Anda',
+        loginModalEmailLabel: 'Email',
+        loginModalEmailPlaceholder: 'email@imedin.id',
+        loginModalPinLabel: 'PIN',
+        loginModalPinPlaceholder: '••••',
+        loginModalSubmit: 'Otorisasi Masuk',
+        loadingTasks: 'Memuat data pekerjaan...',
+        noAssignedTasks: 'Belum ada pekerjaan yang ditugaskan untuk Anda.',
+        updateProgressTitle: 'Perbarui Progress',
+        taskLabel: 'Pekerjaan',
+        statusLabel: 'Status',
+        statusOngoing: 'Masih Proses',
+        statusDone: 'Selesai',
+        issueLabel: 'Kendala',
+        issueNone: 'Tidak Ada',
+        issueHas: 'Ada Kendala',
+        mobileDashboard: 'Dashboard',
+        mobileTasks: 'Pekerjaan',
+        mobileAccount: 'Akun',
+        mobileMenu: 'Menu',
+        taskLocked: 'Silakan login untuk melihat pekerjaan Anda.',
+        accountLocked: 'Login terlebih dahulu untuk mengakses akun Anda.',
+        changePhoto: 'Ubah Foto Profil',
+        changePhotoDesc: 'Upload avatar akun Anda',
+        changePin: 'Ubah PIN',
+        changePinDesc: 'Perbarui keamanan login',
+        logout: 'Keluar',
+        logoutDesc: 'Akhiri sesi dan logout',
+        rememberDevice: 'Ingat saya di perangkat ini',
+        changePinModalTitle: 'Ubah Kode PIN',
+        currentPinLabel: 'PIN Saat Ini',
+        newPinLabel: 'PIN Baru (Min 4)',
+        savePinButton: 'Simpan PIN',
+        liveMonitor: 'Live Monitor',
+        reportTitle: 'LAPORAN',
+        shareTask: 'Bagikan Tugas',
+        detailsEveryone: 'Semua Pekerjaan Berjalan',
+        overdueTitle: 'Target Terlewat',
+        activeIssues: 'Semua Kendala Aktif',
+        noOngoingTasks: 'Tidak ada pekerjaan yang sedang berjalan.',
+        noOverdueTasks: 'Tidak ada target yang terlewat!',
+        noActiveIssues: 'Tidak ada kendala aktif saat ini.',
+        noProductionActivity: 'Belum ada aktivitas produksi berjalan.'
+      },
+      en: {
+        workspaceLabel: 'IMEDIN Workspace',
+        dashboardTitle: 'DASHBOARD',
+        dashboardSubtitle: 'Monitor IMEDIN operational performance in real time.',
+        myTasksLabel: 'My Tasks',
+        myTasksSubtitle: 'All tasks assigned and tagged to you.',
+        myAccountLabel: 'My Account',
+        accountHeader: 'Account Settings',
+        accountSubtitle: 'Manage your profile and account security.',
+        adminMenuLabel: 'Admin Menu',
+        releaseNoteButton: 'Publish Note',
+        noteTeamLabel: 'Team Notes',
+        searchPlaceholder: 'Search tasks, name...',
+        gridLabel: 'Grid',
+        timelineLabel: 'Timeline',
+        exportLabel: 'Export',
+        newTaskButton: 'New Task',
+        loginStaff: 'Staff Login',
+        signIn: 'Sign In',
+        forgotPin: 'Forgot PIN?',
+        emailPlaceholder: 'Email',
+        pinPlaceholder: 'P I N',
+        loginRequiredTitle: 'Login Required',
+        loginRequiredText: 'Please sign in first to access this feature.',
+        loginModalTitle: 'Sign in to System',
+        loginModalSubtitle: 'Use your IMEDIN account',
+        loginModalEmailLabel: 'Email',
+        loginModalEmailPlaceholder: 'email@imedin.id',
+        loginModalPinLabel: 'PIN',
+        loginModalPinPlaceholder: '••••',
+        loginModalSubmit: 'Authorize Sign In',
+        loadingTasks: 'Loading task data...',
+        noAssignedTasks: 'No tasks assigned to you yet.',
+        updateProgressTitle: 'Update Progress',
+        taskLabel: 'Task',
+        statusLabel: 'Status',
+        statusOngoing: 'In Progress',
+        statusDone: 'Completed',
+        issueLabel: 'Issue',
+        issueNone: 'No Issue',
+        issueHas: 'Has Issue',
+        mobileDashboard: 'Dashboard',
+        mobileTasks: 'Tasks',
+        mobileAccount: 'Account',
+        mobileMenu: 'Menu',
+        taskLocked: 'Please log in to view your tasks.',
+        accountLocked: 'Login first to access your account.',
+        accountHeader: 'Account Settings',
+        changePhoto: 'Change Profile Photo',
+        changePhotoDesc: 'Upload your account avatar',
+        changePin: 'Change PIN',
+        changePinDesc: 'Update your login security',
+        logout: 'Logout',
+        logoutDesc: 'End session and logout',
+        rememberDevice: 'Remember me on this device',
+        changePinModalTitle: 'Change PIN Code',
+        currentPinLabel: 'Current PIN',
+        newPinLabel: 'New PIN (Min 4)',
+        savePinButton: 'Save PIN',
+        liveMonitor: 'Live Monitor',
+        reportTitle: 'REPORT',
+        shareTask: 'Share Task',
+        detailsEveryone: 'All Active Tasks',
+        overdueTitle: 'Missed Deadline',
+        activeIssues: 'Active Issues',
+        noOngoingTasks: 'No ongoing tasks at the moment.',
+        noOverdueTasks: 'No overdue targets!',
+        noActiveIssues: 'No active issues right now.',
+        noProductionActivity: 'No active production activity.'
+      }
+    };
+
+    function t(key) {
+      return (translations[locale] && translations[locale][key]) || translations['id'][key] || key;
+    }
+
+    function switchLanguage() {
+      locale = locale === 'id' ? 'en' : 'id';
+      localStorage.setItem(LS_LANG_KEY, locale);
+      renderTranslation();
+    }
+
+    function renderTranslation() {
+      document.documentElement.lang = locale;
+      document.title = locale === 'id' ? 'IMEDIN Workspace — PrdIMD OS 2026' : 'IMEDIN Workspace — PrdIMD OS 2026';
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (translations[locale] && translations[locale][key]) el.innerText = translations[locale][key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n-placeholder');
+        if (translations[locale] && translations[locale][key]) el.placeholder = translations[locale][key];
+      });
+      var btn = document.getElementById('langToggleLabel');
+      if (btn) btn.innerText = locale === 'id' ? 'EN' : 'ID';
+      var search = document.getElementById('searchInput');
+      if (search) search.placeholder = t('searchPlaceholder');
+      var exportBtn = document.getElementById('btnExportCSV');
+      if (exportBtn) exportBtn.innerHTML = `<i class="fas fa-file-excel"></i> ${t('exportLabel')}`;
+      var btnViewKartu = document.getElementById('btnViewKartu');
+      var btnViewKalender = document.getElementById('btnViewKalender');
+      if (btnViewKartu) btnViewKartu.innerHTML = `<i class="fas fa-th-large text-[11px]"></i> ${t('gridLabel')}`;
+      if (btnViewKalender) btnViewKalender.innerHTML = `<i class="fas fa-calendar-alt text-[11px]"></i> ${t('timelineLabel')}`;
+      var btnTambahLine = document.getElementById('btnTambahLine');
+      if (btnTambahLine) btnTambahLine.innerHTML = `<i class="fas fa-plus text-brand-500 mr-1.5"></i> ${t('newTaskButton')}`;
+      var authBtn = document.getElementById('btnSbLogin');
+      if (authBtn && authBtn.dataset.originalText) authBtn.innerHTML = authBtn.dataset.originalText;
+    }
+
+    function assignI18nAttributes() {
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (translations[locale] && translations[locale][key]) el.innerText = translations[locale][key];
+      });
+    }
 
     // ════════════════════════════════
     // PERSISTENT LOGIN — localStorage
@@ -1263,16 +1519,37 @@
     var _lastActivePage = 'dashboard';
 
     function navigateTo(page) {
+      if ((page === 'pekerjaan' || page === 'akun') && !curUser.logged) {
+        page = 'dashboard';
+        Swal.fire({
+          title: t('loginRequiredTitle'),
+          text: t('loginRequiredText'),
+          icon: 'info',
+          confirmButtonText: t('signIn'),
+          customClass:{popup:'rounded-3xl'}
+        });
+        bukaModal('modalLogin');
+      }
       document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
       document.querySelectorAll('.sidebar-menu-item').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav-item').forEach(b=>b.classList.remove('active'));
       var pageEl = document.getElementById('page'+page.charAt(0).toUpperCase()+page.slice(1));
       var navEl  = document.getElementById('nav'+page.charAt(0).toUpperCase()+page.slice(1));
+      var mobileNav = document.querySelector('.mobile-nav-item[data-page="'+page+'"]');
       if (pageEl) pageEl.classList.add('active');
       if (navEl)  navEl.classList.add('active');
+      if (mobileNav) mobileNav.classList.add('active');
       if (page === 'pekerjaan') renderHalamanPekerjaan();
       if (page === 'akun') renderHalamanAkun();
       _lastActivePage = page;
       if (window.innerWidth < 768) toggleSidebarMobile(true);
+    }
+
+    function updateMobileNav() {
+      document.querySelectorAll('.mobile-auth-only').forEach(function(button) {
+        if (curUser.logged) button.classList.remove('hidden');
+        else button.classList.add('hidden');
+      });
     }
 
     // ════════════════════════════════
@@ -1281,12 +1558,13 @@
     function renderHalamanPekerjaan() {
       var container = document.getElementById('containerPekerjaanSaya');
       if (!curUser.logged) {
-        container.innerHTML = `<div class="text-center py-14 text-slate-400 font-semibold text-sm"><i class="fas fa-lock text-3xl mb-4 block text-slate-200"></i>Silakan login untuk melihat pekerjaan Anda.</div>`;
+        container.innerHTML = `<div class="text-center py-14 text-slate-400 font-semibold text-sm"><i class="fas fa-lock text-3xl mb-4 block text-slate-200"></i>${t('taskLocked')}</div>`;
         return;
       }
       var tugas = (dataMaster.mentah||[]).filter(p => p.nama===curUser.nama || (p.taggedPersonel&&p.taggedPersonel.includes(curUser.nama)));
+      tugas.sort(function(a,b){ return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(); });
       if (tugas.length === 0) {
-        container.innerHTML = `<div class="text-center py-14 text-slate-400 font-semibold text-sm"><i class="fas fa-inbox text-3xl mb-4 block text-slate-200"></i>Belum ada pekerjaan yang ditugaskan untuk Anda.</div>`;
+        container.innerHTML = `<div class="text-center py-14 text-slate-400 font-semibold text-sm"><i class="fas fa-inbox text-3xl mb-4 block text-slate-200"></i>${t('noAssignedTasks')}</div>`;
         return;
       }
       container.innerHTML = '';
@@ -1355,11 +1633,14 @@
     // HALAMAN AKUN
     // ════════════════════════════════
     function renderHalamanAkun() {
-      if (!curUser.logged) return;
+      if (!curUser.logged) {
+        navigateTo('dashboard');
+        return;
+      }
       document.getElementById('akunAvatarText').innerText = curUser.nama.substring(0,2).toUpperCase();
       document.getElementById('akunNama').innerText = curUser.nama;
       document.getElementById('akunEmail').innerText = curUser.email;
-      document.getElementById('akunRole').innerText = curUser.isAdmin ? 'Administrator' : 'Staff Member';
+      document.getElementById('akunRole').innerText = curUser.role ? curUser.role : (curUser.isAdmin ? 'Administrator' : 'Staff Member');
       // Tampilkan foto profil
       var foto = curUser.fotoUrl || muatFotoProfil(curUser.email);
       var avatarDiv = document.getElementById('akunAvatar');
@@ -1484,11 +1765,26 @@
     // ════════════════════════════════
     // JAM
     // ════════════════════════════════
+    var clockInterval = null;
     function mulaiJam() {
-      setInterval(() => {
+      // Clear previous interval if any
+      if (clockInterval) clearInterval(clockInterval);
+
+      function updateClock() {
+        if (document.hidden || !curUser.logged) return;
         var n = new Date();
-        document.getElementById('liveClock').innerHTML = `<i class="far fa-clock text-brand-400 text-[10px]"></i> ${n.toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short'})} &bull; ${n.toLocaleTimeString('id-ID',{hour12:false})}`;
-      }, 1000);
+        var el = document.getElementById('liveClock');
+        if (el) {
+          el.innerHTML = `<i class="far fa-clock text-brand-400 text-[10px]"></i> ${n.toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short'})} &bull; ${n.toLocaleTimeString('id-ID',{hour12:false})}`;
+        }
+      }
+
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) updateClock();
+      });
+
+      clockInterval = setInterval(updateClock, 1000);
+      updateClock();
     }
 
     // ════════════════════════════════
@@ -1498,9 +1794,11 @@
       var s=document.getElementById('mainSidebar'), ov=document.getElementById('sidebarOverlay');
       if (forceClose||!s.classList.contains('-translate-x-full')) {
         s.classList.add('-translate-x-full'); ov.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
         document.getElementById('hamburgerIcon').className = 'fas fa-bars';
       } else {
         s.classList.remove('-translate-x-full'); ov.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
         document.getElementById('hamburgerIcon').className = 'fas fa-times';
       }
     }
@@ -1512,7 +1810,7 @@
       var sbCard = document.getElementById('sidebarAuthArea');
       if (curUser.logged) {
         var inisial = curUser.nama.substring(0,2).toUpperCase();
-        var roleName = curUser.isAdmin ? 'Administrator' : 'Staff Member';
+        var roleName = curUser.role ? curUser.role : (curUser.isAdmin ? 'Administrator' : 'Staff Member');
         var foto = curUser.fotoUrl || muatFotoProfil(curUser.email);
         var avatarHtml = foto
           ? `<img src="${foto}" class="w-full h-full object-cover rounded-xl" alt="Foto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`+
@@ -1544,20 +1842,20 @@
         sbCard.innerHTML = `
           <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
             <h3 class="text-white font-extrabold text-[12px] mb-3 flex items-center gap-2">
-              <i class="fas fa-user-lock text-brand-400 text-xs"></i> Login Staff
+              <i class="fas fa-user-lock text-brand-400 text-xs"></i> <span data-i18n="loginStaff">Login Staff</span>
             </h3>
-            <input type="email" id="sbEmail" placeholder="Email" autocomplete="email"
+            <input type="email" id="sbEmail" placeholder="Email" autocomplete="email" data-i18n-placeholder="emailPlaceholder"
               class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-xl text-xs mb-2 outline-none focus:border-brand-500 placeholder-slate-500 transition">
-            <input type="password" id="sbPin" placeholder="P I N" autocomplete="current-password"
+            <input type="password" id="sbPin" placeholder="P I N" autocomplete="current-password" data-i18n-placeholder="pinPlaceholder"
               class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-xl text-xs text-center tracking-[0.3em] mb-3 outline-none focus:border-brand-500 placeholder-slate-500 transition"
               onkeypress="if(event.key==='Enter') prosesLoginSidebar()">
             <button id="btnSbLogin" onclick="prosesLoginSidebar()"
               class="w-full btn-primary text-white font-bold text-xs py-2.5 rounded-xl flex justify-center items-center gap-1.5">
-              <i class="fas fa-sign-in-alt"></i> Masuk Sistem
+              <i class="fas fa-sign-in-alt"></i> <span data-i18n="signIn">Masuk Sistem</span>
             </button>
             <button type="button" onclick="bukaModalLupaPin()"
               class="w-full text-[10px] text-slate-500 hover:text-brand-300 font-medium mt-2.5 text-center transition py-1 block">
-              <i class="fas fa-unlock-alt mr-1"></i> Lupa PIN?
+              <i class="fas fa-unlock-alt mr-1"></i> <span data-i18n="forgotPin">Lupa PIN?</span>
             </button>
           </div>`;
 
@@ -1565,6 +1863,7 @@
         document.getElementById('navAkun').classList.add('hidden');
         document.getElementById('dividerAdmin').classList.add('hidden');
       }
+      renderTranslation();
     }
 
     // ════════════════════════════════
@@ -1572,13 +1871,17 @@
     // ════════════════════════════════
     function updateAuthUI() {
       renderSidebarAuth();
+      updateMobileNav();
       var area = document.getElementById('authStatusArea'); if (area) area.innerHTML = '';
-      if (curUser.logged && curUser.isAdmin) {
+      if (curUser.logged && (curUser.isAdmin || (curUser.role && curUser.role.toLowerCase() === 'ppic'))) {
         document.getElementById('btnTambahLine').classList.remove('hidden');
+      } else {
+        document.getElementById('btnTambahLine').classList.add('hidden');
+      }
+      if (curUser.logged && curUser.isAdmin) {
         document.getElementById('btnExportCSV').classList.remove('hidden');
         document.getElementById('btnExportCSV').classList.add('flex');
       } else {
-        document.getElementById('btnTambahLine').classList.add('hidden');
         document.getElementById('btnExportCSV').classList.add('hidden');
         document.getElementById('btnExportCSV').classList.remove('flex');
       }
@@ -1600,7 +1903,7 @@
         segarkan();
         Swal.fire({ title:'Berhasil!', text:`Selamat datang, ${curUser.nama}!`, icon:'success', timer:1800, showConfirmButton:false, customClass:{popup:'rounded-3xl'} });
       } else {
-        setL('btnSbLogin', false, '<i class="fas fa-sign-in-alt"></i> Masuk Sistem');
+        setL('btnSbLogin', false, `<i class="fas fa-sign-in-alt"></i> ${t('signIn')}`);
         Swal.fire({ title:'Gagal', text:res.message, icon:'error', customClass:{popup:'rounded-3xl'} });
       }
     }
@@ -1649,6 +1952,11 @@
       updateAuthUI();
       segarkan();
       navigateTo('dashboard');
+      // Stop clock interval on logout
+      if (typeof clockInterval !== 'undefined' && clockInterval) {
+        clearInterval(clockInterval);
+        clockInterval = null;
+      }
     }
 
     function bukaModalLupaPin() {
@@ -1729,7 +2037,7 @@
       isFetching = false;
       if (!res || !res.success) return;
       dataMaster = res;
-      dataMaster.mentah = res.rawData;
+      dataMaster.mentah = res.rawData.sort(function(a,b){ return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(); });
       renderStatCards(res.stats, res.reminders, res.kendalaAktif, res.terlewatCount||0, res.upcomingCount||0);
       renderProduksi(res.listProduksiAktif);
       renderMemoSidebar(res.memos);
@@ -1761,7 +2069,7 @@
       var container = document.getElementById('containerProsesDenganDeadline');
       var allBerjalan = (dataMaster.mentah||[]).filter(p=>p.status==='Sedang Berjalan');
       if (allBerjalan.length === 0) {
-        container.innerHTML = `<div class="text-center py-10 text-slate-400 font-semibold text-sm"><i class="fas fa-check-circle text-2xl mb-3 block text-slate-200"></i>Tidak ada pekerjaan yang sedang berjalan.</div>`;
+        container.innerHTML = `<div class="text-center py-10 text-slate-400 font-semibold text-sm"><i class="fas fa-check-circle text-2xl mb-3 block text-slate-200"></i>${t('noOngoingTasks')}</div>`;
         bukaModal('modalProsesDenganDeadline'); return;
       }
       var overdue=[],today=[],mendesak=[],normal=[];
@@ -1809,7 +2117,7 @@
       var container = document.getElementById('containerTargetTerlewat');
       var terlewat = (dataMaster.reminders||[]).filter(r=>r.diff<0);
       if (terlewat.length === 0) {
-        container.innerHTML = `<div class="text-center py-10 text-slate-400 font-semibold text-sm"><i class="fas fa-check-circle text-2xl mb-3 block text-slate-200"></i>Tidak ada target yang terlewat!</div>`;
+        container.innerHTML = `<div class="text-center py-10 text-slate-400 font-semibold text-sm"><i class="fas fa-check-circle text-2xl mb-3 block text-slate-200"></i>${t('noOverdueTasks')}</div>`;
       } else {
         terlewat.sort((a,b)=>a.diff-b.diff);
         container.innerHTML = terlewat.map(r => {
@@ -1842,7 +2150,7 @@
       var container = document.getElementById('containerIsuAktif');
       var kendala = dataMaster.kendalaAktif||[];
       if (kendala.length === 0) {
-        container.innerHTML = `<div class="text-center py-10 text-slate-400 font-semibold text-sm"><i class="fas fa-shield-alt text-2xl mb-3 block text-slate-200"></i>Tidak ada kendala aktif saat ini.</div>`;
+        container.innerHTML = `<div class="text-center py-10 text-slate-400 font-semibold text-sm"><i class="fas fa-shield-alt text-2xl mb-3 block text-slate-200"></i>${t('noActiveIssues')}</div>`;
       } else {
         container.innerHTML = kendala.map(k=>`
           <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 shadow-sm flex items-center gap-4 cursor-pointer hover:border-rose-400 transition" onclick="lihatDetailTugasDariModal('modalIsuAktif',${k.row})">
@@ -1865,7 +2173,7 @@
       var conProd = document.getElementById('containerProduksi');
       conProd.innerHTML = '';
       if (!listProduksiAktif || listProduksiAktif.length === 0) {
-        conProd.innerHTML = `<div class="col-span-full p-8 rounded-[1.4rem] border-2 border-dashed border-slate-200 text-center text-slate-400 font-bold text-sm bg-slate-50/40">Belum ada aktivitas produksi berjalan.</div>`;
+        conProd.innerHTML = `<div class="col-span-full p-8 rounded-[1.4rem] border-2 border-dashed border-slate-200 text-center text-slate-400 font-bold text-sm bg-slate-50/40">${t('noProductionActivity')}</div>`;
         return;
       }
       listProduksiAktif.forEach(l => {
@@ -2448,10 +2756,22 @@
     // ════════════════════════════════
     // INIT
     // ════════════════════════════════
-    window.onload = function() {
+    function handleWindowLoad() {
       mulaiJam();
+      renderTranslation();
 
       // ── PERSISTENT LOGIN: coba muat sesi tersimpan ──
+      /**
+       * @typedef {Object} UserSession
+       * @property {boolean} logged
+       * @property {string} nama
+       * @property {string} email
+       * @property {boolean} isAdmin
+       * @property {string} [fotoUrl]
+       * @property {number} [savedAt]
+       */
+
+      /** @type {UserSession|null} */
       var savedSession = muatSesiLogin();
       if (savedSession && savedSession.logged) {
         curUser = {
@@ -2460,16 +2780,22 @@
         };
         updateAuthUI();
         console.log('[IMEDIN] Sesi dipulihkan untuk:', curUser.nama);
+        sessionStorage.setItem('popupMemoShown', '1');
       } else {
-        updateAuthUI();
+        updateMobileNav();
       }
 
-      segarkan();
-      tampilkanPopupMemo();
-
       // Auto-refresh setiap 5 detik
-      setInterval(() => { if (!isFetching && curUser.logged) segarkan(); }, 5000);
-    };
+      window._refreshIntervalId = setInterval(() => { if (!isFetching && curUser.logged) segarkan(); }, 5000);
+
+      // Clear interval on page unload or hide
+      window.addEventListener('beforeunload', () => { if (window._refreshIntervalId) clearInterval(window._refreshIntervalId); });
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden && window._refreshIntervalId) clearInterval(window._refreshIntervalId);
+        else if (!document.hidden && !window._refreshIntervalId) window._refreshIntervalId = setInterval(() => { if (!isFetching && curUser.logged) segarkan(); }, 5000);
+      });
+    }
+    window.onload = handleWindowLoad;
   </script>
 </body>
 </html>
