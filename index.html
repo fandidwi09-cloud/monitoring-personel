@@ -719,7 +719,7 @@
               <i class="fas fa-chart-pie text-brand-300"></i>
               <span class="grad-text" data-i18n="dash_title">DASHBOARD</span>
             </h1>
-            <p class="text-xs text-slate-400 mt-1.5 font-medium" data-i18n="dash_subtitle">Pantau performa operasional tim IMEDIN secara real-time.</p>
+            <p class="text-xs text-slate-400 mt-1.5 font-medium" data-i18n="dash_subtitle">Pantau performa operasional tim produksi secara real-time.</p>
           </div>
           <div id="authStatusArea" class="shrink-0 relative z-10"></div>
         </div>
@@ -732,7 +732,7 @@
             <div class="prod-hero-icon"><i class="fas fa-industry"></i></div>
             <div>
               <h2 class="prod-hero-title flex items-center gap-2">
-                <span data-i18n="prod_title">Lini Produksi Aktif</span>
+                <span data-i18n="prod_title">Aktifitas Produksi</span>
               </h2>
               <p class="prod-hero-sub" data-i18n="prod_subtitle">Monitoring real-time jalur produksi IMEDIN</p>
             </div>
@@ -1098,9 +1098,9 @@
       <h3 class="font-extrabold text-lg text-slate-900 mb-6 flex items-center gap-2"><i class="fas fa-industry text-brand-500"></i> Aktivasi Line Baru</h3>
       <form onsubmit="event.preventDefault();submitLine();" class="space-y-4">
         <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Nomor WO</label><input type="text" id="lNomorWO" placeholder="Cth: WO-2026-001" class="w-full border border-slate-200 p-3 rounded-xl text-sm font-mono font-bold"></div>
-        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Pos Area / Line</label><input type="text" id="lNama" placeholder="Misal: Line Perakitan A" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
-        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Kategori</label><select id="lJenis" class="w-full border border-slate-200 p-3 rounded-xl text-sm bg-white"><option>Elektromedik</option><option>Non-Elektromedik</option></select></div>
-        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Produk Medis</label><input type="text" id="lNamaProduk" placeholder="Nama Produk" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
+        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Area / Line</label><input type="text" id="lNama" placeholder="Misal: Assembly room / Line 1" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
+        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Kategori</label><select id="lJenis" class="w-full border border-slate-200 p-3 rounded-xl text-sm bg-white"><option>Elektromedik</option><option>In-Vitro Diagnostic (IVD)</option><option>Non-Elektromedik</option></select></div>
+        <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Produk</label><input type="text" id="lNamaProduk" placeholder="Nama Produk" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
         <div class="grid grid-cols-2 gap-3">
           <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Target QTY</label><input type="number" id="lQty" placeholder="0" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
           <div><label class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block mb-1">Deadline</label><input type="date" id="lDeadline" class="w-full border border-slate-200 p-3 rounded-xl text-sm" required></div>
@@ -1439,8 +1439,8 @@
         nav_dashboard:'Dashboard', nav_tasks:'Pekerjaan Saya', nav_tasks_short:'Pekerjaan',
         nav_account:'Akun Saya', nav_account_short:'Akun', nav_admin:'Menu Admin',
         nav_new_note:'Rilis Note Baru', nav_team_notes:'Note Tim',
-        dash_title:'DASHBOARD', dash_subtitle:'Pantau performa operasional tim IMEDIN secara real-time.',
-        prod_title:'Lini Produksi Aktif', prod_subtitle:'Monitoring real-time jalur produksi IMEDIN', prod_add_line:'Buka Line Baru',
+        dash_title:'DASHBOARD', dash_subtitle:'Pantau performa operasional tim produksi secara real-time.',
+        prod_title:'Aktifitas Produksi', prod_subtitle:'Monitoring real-time jalur produksi IMEDIN', prod_add_line:'Buka Line Baru',
         prod_empty:'Belum ada aktivitas produksi berjalan.', prod_click_detail:'Klik untuk detail',
         stat_done:'Selesai', stat_process:'Proses', stat_approval:'ACC', stat_revision:'Revisi',
         stat_overdue:'Target<br>Terlewat', stat_issues:'Kendala<br>Aktif',
@@ -2083,7 +2083,7 @@
               <i class="fas fa-user-lock text-brand-400 text-xs"></i> ${t('login_staff')}
             </h3>
             <input type="email" id="sbEmail" placeholder="Email" autocomplete="email"
-              class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-xl text-xs mb-2 outline-none focus:border-brand-500 placeholder-slate-500 transition">
+              class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-xl text-xs text-center mb-2 outline-none focus:border-brand-500 placeholder-slate-500 transition">
             <input type="password" id="sbPin" placeholder="P I N" autocomplete="current-password"
               class="w-full bg-black/40 border border-white/10 text-white px-3 py-2.5 rounded-xl text-xs text-center tracking-[0.3em] mb-3 outline-none focus:border-brand-500 placeholder-slate-500 transition"
               onkeypress="if(event.key==='Enter') prosesLoginSidebar()">
@@ -2217,7 +2217,7 @@
     function bukaModalLupaPin() {
       Swal.fire({
         title:'<span style="font-size:1.1rem">Reset PIN</span>',
-        html:`<p style="font-size:13px;color:#64748b;margin-bottom:14px;">Email terdaftar. PIN akan direset ke <strong style="color:#0060c7">1234</strong>.</p><input type="email" id="swalEmailReset" class="swal2-input" placeholder="email@imedin.id" style="font-size:13px;">`,
+        html:`<p style="font-size:13px;color:#64748b;margin-bottom:14px;">Email yang terdaftar. PIN akan direset ke <strong style="color:#0060c7">Default</strong>.</p><input type="email" id="swalEmailReset" class="swal2-input" placeholder="email@gmail.com" style="font-size:13px;">`,
         confirmButtonText:'Reset PIN Saya', confirmButtonColor:'#0d82e3',
         showCancelButton:true, cancelButtonText:'Batal', focusConfirm:false,
         customClass:{popup:'rounded-[2rem]',confirmButton:'rounded-xl px-6 text-sm font-bold',cancelButton:'rounded-xl px-6 text-sm font-bold'},
@@ -2969,7 +2969,7 @@
         .then(async r => { if (r.isConfirmed) { await callAPI("hapusTugasServer",{row,adminEmail:curUser.email}); tutupModal('modalList'); segarkan(); } });
     }
     function selesaikanLineUI(row) {
-      Swal.fire({ title:'Tutup Lini Produksi?', icon:'question', showCancelButton:true, confirmButtonColor:'#10b981', customClass:{popup:'rounded-3xl',confirmButton:'rounded-xl',cancelButton:'rounded-xl'} })
+      Swal.fire({ title:'Tutup Aktifitas Produksi?', icon:'question', showCancelButton:true, confirmButtonColor:'#10b981', customClass:{popup:'rounded-3xl',confirmButton:'rounded-xl',cancelButton:'rounded-xl'} })
         .then(async r => { if (r.isConfirmed) { await callAPI("selesaikanLine",{row,userEmail:curUser.email}); segarkan(); } });
     }
     async function submitLine() {
