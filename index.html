@@ -595,6 +595,9 @@
       cursor:pointer;transition:background .2s;
     }
     .memo-card:hover{background:rgba(13,130,227,.14)}
+
+    /* ─── Pull to refresh ─── */
+    #ptrIndicator{position:absolute;top:0;left:0;right:0;display:flex;justify-content:center;align-items:center;height:0;overflow:hidden;transition:height .15s ease;color:#0d82e3;font-size:12px;font-weight:800;z-index:30;gap:6px}
   </style>
 </head>
 <body class="flex flex-col md:flex-row h-screen overflow-hidden antialiased" onclick="tutupDropdownUser(event)">
@@ -1167,8 +1170,11 @@
       </div>
       <div id="memoBacaBody" class="memo-read-body px-4 py-3 text-[13px] text-slate-600 overflow-y-auto flex-1"></div>
       <div id="memoBacaLampiran" class="px-4 pb-2 hidden shrink-0"></div>
-      <div class="px-4 py-3 border-t border-slate-100 shrink-0">
-        <button type="button" onclick="tutupModal('modalMemoBaca')" class="w-full btn-primary py-2.5 rounded-xl font-bold text-xs" data-i18n="announcement_ok">Mengerti</button>
+      <div class="px-4 py-3 border-t border-slate-100 shrink-0 flex gap-2">
+        <button type="button" id="btnHapusMemo" onclick="hapusMemoUI()" class="hidden bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-xs px-4 py-2.5 rounded-xl transition">
+          <i class="fas fa-trash"></i>
+        </button>
+        <button type="button" onclick="tutupModal('modalMemoBaca')" class="flex-1 btn-primary py-2.5 rounded-xl font-bold text-xs" data-i18n="announcement_ok">Mengerti</button>
       </div>
     </div>
   </div>
@@ -1350,8 +1356,8 @@
   </div>
 
   <!-- Modal List Universal -->
-  <div id="modalList" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[990]">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-5xl h-[88vh] flex flex-col overflow-hidden modal-box">
+  <div id="modalList" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[990]" onclick="handleBackdropClick(event,'modalList')">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-5xl h-[88vh] flex flex-col overflow-hidden modal-box" onclick="event.stopPropagation()">
       <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white shadow-sm z-10 shrink-0">
         <h3 id="listTitle" class="font-extrabold text-slate-900 text-lg"></h3>
         <button onclick="tutupModal('modalList')" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"><i class="fas fa-times text-lg"></i></button>
@@ -1374,8 +1380,8 @@
   </div>
 
   <!-- Modal Proses dengan Deadline -->
-  <div id="modalProsesDenganDeadline" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[995]">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl h-[85vh] flex flex-col overflow-hidden modal-box">
+  <div id="modalProsesDenganDeadline" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[995]" onclick="handleBackdropClick(event,'modalProsesDenganDeadline')">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl h-[85vh] flex flex-col overflow-hidden modal-box" onclick="event.stopPropagation()">
       <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
         <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2"><i class="fas fa-tasks text-brand-500"></i> Semua Pekerjaan Berjalan</h3>
         <button onclick="tutupModal('modalProsesDenganDeadline')" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
@@ -1385,8 +1391,8 @@
   </div>
 
   <!-- Modal Target Terlewat -->
-  <div id="modalTargetTerlewat" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[995]">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden modal-box">
+  <div id="modalTargetTerlewat" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[995]" onclick="handleBackdropClick(event,'modalTargetTerlewat')">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden modal-box" onclick="event.stopPropagation()">
       <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
         <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2"><i class="fas fa-calendar-times text-orange-500"></i> Target Terlewat</h3>
         <button onclick="tutupModal('modalTargetTerlewat')" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
@@ -1396,8 +1402,8 @@
   </div>
 
   <!-- Modal Isu Aktif -->
-  <div id="modalIsuAktif" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[995]">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden modal-box">
+  <div id="modalIsuAktif" class="fixed inset-0 glass-backdrop hidden items-center justify-center p-4 z-[995]" onclick="handleBackdropClick(event,'modalIsuAktif')">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col overflow-hidden modal-box" onclick="event.stopPropagation()">
       <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
         <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2"><i class="fas fa-exclamation-triangle text-rose-500"></i> Semua Kendala Aktif</h3>
         <button onclick="tutupModal('modalIsuAktif')" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
@@ -1422,6 +1428,7 @@
     var taggedPersonelUpdate = [];
     var taggedPersonelInput  = [];
     var currentDetailLineRow = null;
+    var currentMemoRow = null;
 
     // ── LocalStorage keys ──
     const LS_USER_KEY = 'imedin_user_session';
@@ -2532,22 +2539,24 @@
         var url = typeof item === 'string' ? item : (item.url || '');
         var type = (item && item.type) ? item.type : '';
         if (!url) return '';
+        var fallback = '<a href=\'' + url + '\' target=\'_blank\' class=\'memo-lampiran-item flex items-center justify-center p-4 text-brand-600 text-xs font-bold\' style=\'min-height:90px\'><i class=\'fas fa-file mr-1\'></i>File ' + (idx+1) + '</a>';
         if (type.indexOf('video') >= 0 || url.match(/\.(mp4|webm|mov)(\?|$)/i)) {
-          return '<div class="memo-lampiran-item"><video src="'+url+'" controls preload="metadata"></video></div>';
+          return '<div class="memo-lampiran-item"><video src="'+url+'" controls preload="metadata" onerror="this.parentElement.outerHTML=\''+fallback.replace(/'/g,"\\'")+'\'"></video></div>';
         }
         if (type.indexOf('pdf') >= 0 || url.match(/\.pdf(\?|$)/i)) {
-          return '<a href="'+url+'" target="_blank" class="memo-lampiran-item flex items-center justify-center p-4 text-brand-600 text-xs font-bold"><i class="fas fa-file-pdf text-2xl"></i> PDF '+(idx+1)+'</a>';
+          return '<a href="'+url+'" target="_blank" class="memo-lampiran-item flex items-center justify-center p-4 text-brand-600 text-xs font-bold"><i class="fas fa-file-pdf text-2xl"></i>&nbsp;PDF '+(idx+1)+'</a>';
         }
         if (url.match(/\.(jpeg|jpg|gif|png|webp)(\?|$)/i) || type.indexOf('image') >= 0) {
-          return '<a href="'+url+'" target="_blank" class="memo-lampiran-item"><img src="'+url+'" alt="Lampiran '+(idx+1)+'" loading="lazy"></a>';
+          return '<a href="'+url+'" target="_blank" class="memo-lampiran-item"><img src="'+url+'" alt="Lampiran '+(idx+1)+'" loading="lazy" onerror="this.parentElement.outerHTML=\''+fallback.replace(/'/g,"\\'")+'\'"></a>';
         }
-        return '<a href="'+url+'" target="_blank" class="memo-lampiran-item flex items-center justify-center p-3 text-brand-600 text-xs font-bold"><i class="fas fa-paperclip mr-1"></i>File '+(idx+1)+'</a>';
+        return fallback;
       }).join('') + '</div>';
     }
 
     function bukaMemoDetail(row) {
       var memo = (dataMaster.memos || []).find(function(m) { return m.row === row; });
       if (!memo) return;
+      currentMemoRow = row;
       document.getElementById('memoBacaTgl').textContent = memo.tgl || '';
       document.getElementById('memoBacaJudul').textContent = memo.judul || t('announcement_title');
       var bodyEl = document.getElementById('memoBacaBody');
@@ -2566,7 +2575,29 @@
         lampEl.innerHTML = '';
         lampEl.classList.add('hidden');
       }
+      var btnHapus = document.getElementById('btnHapusMemo');
+      if (btnHapus) btnHapus.classList.toggle('hidden', !(curUser.logged && canManageAsAdmin()));
       bukaModal('modalMemoBaca');
+    }
+
+    async function hapusMemoUI() {
+      if (!currentMemoRow) return;
+      var result = await Swal.fire({
+        title: 'Hapus Note?', text: 'Note dan lampirannya akan dihapus permanen.',
+        icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Hapus', cancelButtonText: 'Batal',
+        customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl', cancelButton: 'rounded-xl' }
+      });
+      if (!result.isConfirmed) return;
+      var res = await callAPI("hapusMemo", { row: currentMemoRow, adminEmail: curUser.email });
+      if (res.success) {
+        tutupModal('modalMemoBaca');
+        currentMemoRow = null;
+        segarkan();
+        Swal.fire({ title: 'Terhapus', icon: 'success', timer: 1400, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
+      } else {
+        Swal.fire({ title: 'Gagal', text: res.message || 'Backend belum mendukung aksi hapusMemo. Tambahkan handler action "hapusMemo" di Google Apps Script.', icon: 'error', customClass: { popup: 'rounded-3xl' } });
+      }
     }
 
     function renderMemoSidebar(memos) {
@@ -3013,15 +3044,14 @@
     // ════════════════════════════════
     // EXPORT CSV
     // ════════════════════════════════
+    function csvQuote(v) { return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; }
     function exportDataKeCSV() {
       if (!curUser.logged||!canManageAsAdmin()) return Swal.fire('Ditolak','Hanya Admin/Supervisor yang dapat mengunduh CSV.','error');
-      var csvContent = "data:text/csv;charset=utf-8,ID,Nama,Pekerjaan,Status,Kendala,Tenggat,Tag,Terakhir Update,Diperbarui Oleh,Jumlah File\n";
+      var csvContent = "data:text/csv;charset=utf-8," + ["ID","Nama","Pekerjaan","Status","Kendala","Tenggat","Tag","Terakhir Update","Diperbarui Oleh","Jumlah File"].map(csvQuote).join(",") + "\n";
       (dataMaster.mentah||[]).forEach(row => {
-        var det=(row.detailPekerjaan||"").replace(/,/g," ");
-        var ken=(row.detailKendala||"").replace(/,/g," ");
-        var tag=(row.taggedPersonel||[]).join('|');
         var buktiArr = parseBuktiArr(row.bukti, row.buktiArr);
-        csvContent += `${row.row},${row.nama},${row.pekerjaan},${row.status},${ken},${row.targetSelesai},${tag},${row.lastUpdated||row.timestamp||''},${row.updatedBy||''},${buktiArr.length}\n`;
+        var cols = [row.row,row.nama,row.pekerjaan,row.status,row.detailKendala||"",row.targetSelesai,(row.taggedPersonel||[]).join('|'),row.lastUpdated||row.timestamp||'',row.updatedBy||'',buktiArr.length];
+        csvContent += cols.map(csvQuote).join(",") + "\n";
       });
       var encodedUri=encodeURI(csvContent), link=document.createElement("a");
       link.setAttribute("href",encodedUri);
@@ -3067,12 +3097,66 @@
     // POPUP ATURAN
     // ════════════════════════════════
     function tampilkanPopupMemo() {
+      currentMemoRow = null;
       document.getElementById('memoBacaTgl').textContent = '';
       document.getElementById('memoBacaJudul').textContent = t('announcement_title');
       document.getElementById('memoBacaBody').textContent = t('announcement_text');
       document.getElementById('memoBacaLampiran').innerHTML = '';
       document.getElementById('memoBacaLampiran').classList.add('hidden');
+      var btnHapus = document.getElementById('btnHapusMemo');
+      if (btnHapus) btnHapus.classList.add('hidden');
       bukaModal('modalMemoBaca');
+    }
+
+    // ════════════════════════════════
+    // PULL TO REFRESH (mobile)
+    // ════════════════════════════════
+    function initPullToRefresh() {
+      var mainEl = document.querySelector('main');
+      if (!mainEl) return;
+      var startY = 0, pulling = false, threshold = 70;
+
+      var indicator = document.createElement('div');
+      indicator.id = 'ptrIndicator';
+      indicator.innerHTML = '<i class="fas fa-sync-alt" id="ptrIcon"></i><span id="ptrLabel">Tarik untuk refresh</span>';
+      mainEl.style.position = 'relative';
+      mainEl.prepend(indicator);
+
+      mainEl.addEventListener('touchstart', function(e) {
+        if (mainEl.scrollTop <= 0) { startY = e.touches[0].clientY; pulling = true; }
+        else { pulling = false; }
+      }, { passive: true });
+
+      mainEl.addEventListener('touchmove', function(e) {
+        if (!pulling) return;
+        var diff = e.touches[0].clientY - startY;
+        if (diff > 0 && mainEl.scrollTop <= 0) {
+          var h = Math.min(diff * 0.5, 90);
+          indicator.style.height = h + 'px';
+          var lbl = document.getElementById('ptrLabel');
+          var icon = document.getElementById('ptrIcon');
+          if (lbl) lbl.textContent = h >= threshold ? 'Lepas untuk refresh' : 'Tarik untuk refresh';
+          if (icon) icon.style.transform = h >= threshold ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+      }, { passive: true });
+
+      mainEl.addEventListener('touchend', function() {
+        if (!pulling) return;
+        var h = parseInt(indicator.style.height, 10) || 0;
+        if (h >= threshold) {
+          var lbl = document.getElementById('ptrLabel');
+          var icon = document.getElementById('ptrIcon');
+          if (lbl) lbl.textContent = 'Menyinkronkan...';
+          if (icon) icon.classList.add('icon-spin-slow');
+          segarkan().finally(function() {
+            indicator.style.height = '0px';
+            if (icon) icon.classList.remove('icon-spin-slow');
+          });
+        } else {
+          indicator.style.height = '0px';
+        }
+        pulling = false;
+      });
     }
 
     // ════════════════════════════════
@@ -3103,6 +3187,7 @@
 
       segarkan();
       tampilkanPopupMemo();
+      initPullToRefresh();
 
       window.addEventListener('resize', function() {
         if (window.innerWidth >= 768) {
